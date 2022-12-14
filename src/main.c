@@ -13,27 +13,40 @@ void *ft_realloc(void *ptr, size_t size) {
 	return new;
 }
 
-// Read from stdin until EOF and store input in first argument and return size of input
-size_t getinput(char **input) {
-	size_t len = 0;
+void getstdin() {
+	size_t len;
 	size_t size = 0;
-	char buf[4096];
+	unsigned char input[64];
+	unsigned char buffer[64];
+	t_hash hash;
 
-	while ((len = read(0, buf, 4096)) > 0) {
-		// printf("len: %zu, size: %zu\n", len, size);
-		*input = realloc(*input, size + len + 1024);
-		ft_memcpy(*input + size, buf, len);
+	init_hash(&hash);
+	printHash(&hash);
+	bzero(input, 64);
+	while ((len = read(0, buffer, 64)) > 0) {
+		// printf("len: %zu\n", len);
+		if ((size % 64) + len >= 64) {
+			ft_memcpy(input + (size % 64), buffer, 64 - (size % 64));
+			encode512bloc(&hash, (unsigned int *)input);
+			bzero(input, 64);
+			ft_memcpy(input, buffer + (64 - (size % 64)), len - (64 - (size % 64)));
+		} else {
+			ft_memcpy(input + (size % 64), buffer, len);
+		}
 		size += len;
 	}
-	return size;
+	if (size % 64 > 56) {
+		encode512bloc(&hash, (unsigned int *)input);
+	}
+	padding(input, size);
+	encode512bloc(&hash, (unsigned int *)input);
+	printHash(&hash);
 }
 
 int main(int argc, char *argv[])
 {
-	char *input = NULL;
-	size_t len = 0;
-
-	len = getinput(&input);
-	ft_md5(input, len);
+	printf("%zu\n", sizeof(char));
+	printf("%zu\n", sizeof(unsigned int));
+	getstdin();
 	return 0;
 }
