@@ -13,9 +13,9 @@ typedef struct		s_hash
 }					t_hash;
 
 void init_hash(t_hash *hash);
-int	leftRotate(int n, unsigned int d);
 void padding(unsigned char *message, size_t full_len);
 void encode512bloc(t_hash *hash, unsigned int *message);
+void Array32ToLittleEndian(unsigned int *message, size_t size);
 char *printHash(t_hash *hash);
 long *ft_md5(unsigned char *message, size_t len);
 

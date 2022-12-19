@@ -41,8 +41,9 @@ void init_hash(t_hash *hash) {
 	hash->H4 = 0x10325476;
 }
 
-int leftRotate(int n, unsigned int d)
+unsigned int leftRotate(unsigned int n, unsigned int d)
 {
+	// printf("left: %u %u\n", n, d);
 	return (n << d)|(n >> (32 - d));
 }
 
@@ -51,12 +52,6 @@ unsigned int toLittleEndian32(unsigned int num) {
         ((num<<8)&0xff0000) | // move byte 1 to byte 2
         ((num>>8)&0xff00) | // move byte 2 to byte 1
         ((num<<24)&0xff000000); // byte 0 to byte 3
-}
-
-void Array32ToLittleEndian(unsigned int *message, size_t size) {
-	for (size_t index; index < size; index++) {
-		message[index] = toLittleEndian32(message[index]);
-	}
 }
 
 void padding(unsigned char *message, size_t full_len) {
@@ -82,17 +77,18 @@ void encode512bloc(t_hash *hash, unsigned int *message) {
 	unsigned int B = hash->H2;
 	unsigned int C = hash->H3;
 	unsigned int D = hash->H4;
-	unsigned int F, G, temp = 0;
+	unsigned int F = 0;
+	unsigned int G = 0;
+	unsigned int temp = 0;
 
-	Array32ToLittleEndian(message);
-	print_bits((unsigned int*)message, 16);
-	for (int index = 0; index < 64; index++) {
+	print_bits((unsigned char*)message, 64);
+	for (unsigned int index = 0; index < 64; index++) {
 		if (0 <= index && index <= 15) {
 			F = (B & C) | ((~B) & D);
 			G = index;
 		} else if (16 <= index && index <= 31) {
 			F = (D & B) | ((~D) & C);
-			G = (5 * index + 5) % 16;
+			G = (5 * index + 1) % 16;
 		} else if (32 <= index && index <= 47) {
 			F = B ^ C ^ D;
 			G = (3 * index + 5) % 16;
@@ -103,7 +99,7 @@ void encode512bloc(t_hash *hash, unsigned int *message) {
 		temp = D;
 		D = C;
 		C = B;
-		B = leftRotate((A + F + K[index], message[G]), R[index]) + B;
+		B = leftRotate(A + F + K[index] + message[G], R[index]) + B;
 		A = temp;
 	}
 	hash->H1 += A;
@@ -113,15 +109,10 @@ void encode512bloc(t_hash *hash, unsigned int *message) {
 }
 
 char *printHash(t_hash *hash) {
-	for(unsigned int i = 0; i < 4; ++i){
-
-	}
-	printf("%08x%08x%08x%08x\n", hash->H1, hash->H2, hash->H3, hash->H4);
-}
-
-long *ft_md5(unsigned char *message, size_t len) {
-	(void)len;
-	// print_bits(message, len);
-	padding(message, len);
-	return NULL;
+	printf("%08x %08x %08x %08x\n",
+		toLittleEndian32(hash->H1),
+		toLittleEndian32(hash->H2),
+		toLittleEndian32(hash->H3),
+		toLittleEndian32(hash->H4)
+	);
 }

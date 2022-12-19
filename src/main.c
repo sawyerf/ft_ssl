@@ -21,7 +21,6 @@ void getstdin() {
 	t_hash hash;
 
 	init_hash(&hash);
-	printHash(&hash);
 	bzero(input, 64);
 	while ((len = read(0, buffer, 64)) > 0) {
 		// printf("len: %zu\n", len);
@@ -43,8 +42,7 @@ void getstdin() {
 	printHash(&hash);
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	printf("%zu\n", sizeof(char));
 	printf("%zu\n", sizeof(unsigned int));
 	getstdin();
