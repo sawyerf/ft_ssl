@@ -12,11 +12,13 @@ typedef struct		s_hash
 	unsigned int	H4;
 }					t_hash;
 
-void init_hash(t_hash *hash);
+// md5
+void initHash(t_hash *hash);
 void padding(unsigned char *message, size_t full_len);
 void encode512bloc(t_hash *hash, unsigned int *message);
-void Array32ToLittleEndian(unsigned int *message, size_t size);
+
+// Print
 char *printHash(t_hash *hash);
-long *ft_md5(unsigned char *message, size_t len);
+void print_bits(unsigned char *str, size_t len);
 
 #endif

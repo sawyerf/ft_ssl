@@ -23,8 +23,13 @@ Ces 3 fonctions de hashage se base sur la construction de [Merkle-Damgard](https
 1. Preparation
    1. On divise le message en blocs de 512 bits.
    2. On applique un remplissage de manière à avoir un message dont la longueur est un multiple de 512
-   3. on y ajoute la taille du message a la fin
+   3. On y ajoute la taille (en 64bits) totale du message a la fin.
 2. Calcule du hash
+   1. On envoie chacun des blocs de 512 bits dans la fonction de hashage
+   2. On additionne le retour de la fonction a la precendente valeur
+3. Affichage du hash
+   1. On convertie les 4 entiers en little endian
+   2. On l'affiche en hexa
 
 ![lol](https://www.hds.utc.fr/~wschon/sr06/crypto/images/md5_1.gif)
 

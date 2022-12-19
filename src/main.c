@@ -4,15 +4,6 @@
 #include <unistd.h>
 #include "ft_ssl.h"
 
-void *ft_realloc(void *ptr, size_t size) {
-	void *new = malloc(size);
-	if (ptr) {
-		ft_memcpy(new, ptr, size);
-		free(ptr);
-	}
-	return new;
-}
-
 void getstdin() {
 	size_t len;
 	size_t size = 0;
@@ -20,10 +11,9 @@ void getstdin() {
 	unsigned char buffer[64];
 	t_hash hash;
 
-	init_hash(&hash);
+	initHash(&hash);
 	bzero(input, 64);
 	while ((len = read(0, buffer, 64)) > 0) {
-		// printf("len: %zu\n", len);
 		if ((size % 64) + len >= 64) {
 			ft_memcpy(input + (size % 64), buffer, 64 - (size % 64));
 			encode512bloc(&hash, (unsigned int *)input);
@@ -43,8 +33,6 @@ void getstdin() {
 }
 
 int main(int argc, char *argv[]) {
-	printf("%zu\n", sizeof(char));
-	printf("%zu\n", sizeof(unsigned int));
 	getstdin();
 	return 0;
 }

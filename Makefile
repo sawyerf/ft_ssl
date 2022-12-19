@@ -10,6 +10,7 @@ SRC_DIR =	src
 
 SRC_FILE =	main.c \
 			md5.c \
+			utils.c \
 
 CFLAGS =	-I $(INC_DIR) -I libft/inc/ -g # -Wall -g -lm -Werror -Wextra
 

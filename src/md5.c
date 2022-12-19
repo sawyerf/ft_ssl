@@ -1,21 +1,6 @@
 #include "ft_ssl.h"
 #include <stdio.h>
 
-void print_bit(unsigned char n) {
-	for (int i = 7; i >= 0; i--) {
-		printf("%d", (n >> i) & 1);
-	}
-	printf(" ");
-}
-void print_bits(unsigned char *str, size_t len) {
-	printf("len: %zu\n", len);
-	for (size_t i = 0; i < len; i++) {
-		print_bit(str[i]);
-	}
-	printf("\n");
-}
-
-
 unsigned int R[] = {
 	7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
 	5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20,
@@ -34,24 +19,11 @@ unsigned int K[] = {
 	0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
 };
 
-void init_hash(t_hash *hash) {
+void initHash(t_hash *hash) {
 	hash->H1 = 0x67452301;
 	hash->H2 = 0xefcdab89;
 	hash->H3 = 0x98badcfe;
 	hash->H4 = 0x10325476;
-}
-
-unsigned int leftRotate(unsigned int n, unsigned int d)
-{
-	// printf("left: %u %u\n", n, d);
-	return (n << d)|(n >> (32 - d));
-}
-
-unsigned int toLittleEndian32(unsigned int num) {
-	return ((num>>24)&0xff) | // move byte 3 to byte 0
-        ((num<<8)&0xff0000) | // move byte 1 to byte 2
-        ((num>>8)&0xff00) | // move byte 2 to byte 1
-        ((num<<24)&0xff000000); // byte 0 to byte 3
 }
 
 void padding(unsigned char *message, size_t full_len) {
@@ -64,6 +36,18 @@ void padding(unsigned char *message, size_t full_len) {
 	full_len *= 8;
 	bzero(message + end + 1, 64 - end - 1);
 	ft_memcpy(message + 56, &full_len, 8);
+}
+
+unsigned int leftRotate(unsigned int n, unsigned int d)
+{
+	return (n << d)|(n >> (32 - d));
+}
+
+unsigned int toLittleEndian32(unsigned int num) {
+	return ((num>>24)&0xff) | // move byte 3 to byte 0
+        ((num<<8)&0xff0000) | // move byte 1 to byte 2
+        ((num>>8)&0xff00) | // move byte 2 to byte 1
+        ((num<<24)&0xff000000); // byte 0 to byte 3
 }
 
 // &  (bitwise AND)
@@ -81,7 +65,7 @@ void encode512bloc(t_hash *hash, unsigned int *message) {
 	unsigned int G = 0;
 	unsigned int temp = 0;
 
-	print_bits((unsigned char*)message, 64);
+	// print_bits((unsigned char*)message, 64);
 	for (unsigned int index = 0; index < 64; index++) {
 		if (0 <= index && index <= 15) {
 			F = (B & C) | ((~B) & D);
@@ -109,7 +93,7 @@ void encode512bloc(t_hash *hash, unsigned int *message) {
 }
 
 char *printHash(t_hash *hash) {
-	printf("%08x %08x %08x %08x\n",
+	ft_printf("%08x%08x%08x%08x\n",
 		toLittleEndian32(hash->H1),
 		toLittleEndian32(hash->H2),
 		toLittleEndian32(hash->H3),
