@@ -12,6 +12,17 @@ typedef struct		s_hash
 	unsigned int	H4;
 }					t_hash;
 
+typedef struct		s_shaHash
+{
+	unsigned int	H1;
+	unsigned int	H2;
+	unsigned int	H3;
+	unsigned int	H4;
+	unsigned int	H5;
+	unsigned int	H6;
+	unsigned int	H7;
+}					t_shaHash;
+
 // md5
 int md5Router(char **argv);
 void initHash(t_hash *hash);

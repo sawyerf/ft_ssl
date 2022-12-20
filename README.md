@@ -35,5 +35,6 @@ Ces 3 fonctions de hashage se base sur la construction de [Merkle-Damgard](https
 
 ## Source
 - [Youtube - Complément : Fonctions de hachage](https://www.youtube.com/watch?v=-k_axU98AZ4)
-- [Wikipedia MD](https://fr.wikipedia.org/wiki/MD5)
+- [Wikipedia MD5](https://fr.wikipedia.org/wiki/MD5)
 - [Etude d'une fonction de hachage : le MD5](https://www.bibmath.net/crypto/index.php?action=affiche&quoi=moderne/md5)
+- [Wikipedia Sha256](https://en.wikipedia.org/wiki/SHA-2)
