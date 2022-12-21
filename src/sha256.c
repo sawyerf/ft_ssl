@@ -1,4 +1,5 @@
 #include "ft_ssl.h"
+#include <byteswap.h>
 
 unsigned int KK[] = {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -24,11 +25,27 @@ void shaInitHash(t_hash *hash) {
 
 unsigned int rightRotate(unsigned int n, unsigned int d) {
 	// return (n << d)|(n >> (32 - d));
-	return (n >> d) || (n << (32 -d));
+	return (n >> d) || (n << (32 - d));
 }
 
 unsigned int rightShift(unsigned int n, unsigned int d) {
 	return (n >> d);
+}
+
+void shaPadding(unsigned char *message, size_t full_len, t_hash *hash) {
+	size_t end = full_len % 64;
+
+	message[end] = 0x80;
+	if (end >= 56) {
+		shaEncode512Bloc(hash, (unsigned int*)message);
+		bzero(message, 64);
+	} else {
+		bzero(message + end + 1, 64 - end - 1);
+	}
+	full_len *= 8;
+	full_len = swap64(full_len);
+	ft_memcpy(message + 56, &full_len, 8);
+	shaEncode512Bloc(hash, (unsigned int*)message);
 }
 
 // &  (bitwise AND)
@@ -37,7 +54,7 @@ unsigned int rightShift(unsigned int n, unsigned int d) {
 // << (left shift)
 // >> (right shift)
 // ~  (bitwise NOT)
-void shaEncode512Bloc(t_hash *hash, unsigned int *message) {
+void shaEncode512Bloc(t_hash *hash, unsigned int *W) {
 	unsigned int A = hash->H0;
 	unsigned int B = hash->H1;
 	unsigned int C = hash->H2;
@@ -47,10 +64,14 @@ void shaEncode512Bloc(t_hash *hash, unsigned int *message) {
 	unsigned int G = hash->H6;
 	unsigned int H = hash->H7;
 	unsigned int S0, S1, temp1, temp2, CH, maj;
+	unsigned int message[64];
 
+	ft_memcpy(message, W, 64);
+	ft_bzero(message + 16, 192);
+	print_bits((unsigned char *)message, 64);
 	for (unsigned int index = 16; index < 64; index++) {
 		S0 = rightRotate(message[index - 15], 7) ^ rightRotate(message[index - 15], 18) ^ rightShift(message[index - 15], 3);
-		S1 = rightRotate(message[index - 2], 7) ^ rightRotate(message[index - 2], 19) ^ rightShift(message[index - 2], 10);
+		S1 = rightRotate(message[index - 2], 17) ^ rightRotate(message[index - 2], 19) ^ rightShift(message[index - 2], 10);
 		message[index] = message[index - 16] + S0 + message[index - 7] + S1;
 	}
 
@@ -82,7 +103,7 @@ void shaEncode512Bloc(t_hash *hash, unsigned int *message) {
 }
 
 void shaPrintHash(t_hash *hash) {
-	ft_printf("%8x%8x%8x%8x%8x%8x%8x",
+	ft_printf("%08x %08x %08x %08x %08x %08x %08x\n",
 		hash->H0,
 		hash->H1,
 		hash->H2,
@@ -91,5 +112,15 @@ void shaPrintHash(t_hash *hash) {
 		hash->H5,
 		hash->H6,
 		hash->H7
+	);
+	ft_printf("%08x %08x %08x %08x %08x %08x %08x\n",
+		swap32(hash->H0),
+		swap32(hash->H1),
+		swap32(hash->H2),
+		swap32(hash->H3),
+		swap32(hash->H4),
+		swap32(hash->H5),
+		swap32(hash->H6),
+		swap32(hash->H7)
 	);
 }

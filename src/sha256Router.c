@@ -21,12 +21,7 @@ void shaGetFd(int fd, t_hash *hash) {
 		}
 		size += len;
 	}
-	if (size % 64 > 56) {
-		shaEncode512Bloc(hash, (unsigned int *)input);
-	}
-	padding(input, size);
-	print_bits(input, 64);
-	shaEncode512Bloc(hash, (unsigned int *)input);
+	shaPadding(input, size, hash);
 }
 
 void shaGetArg(char *message, t_hash *hash) {
@@ -41,11 +36,7 @@ void shaGetArg(char *message, t_hash *hash) {
 	}
 	bzero(current, 64);
 	ft_memcpy(current, message, len - index);
-	if (len - index > 56) {
-		shaEncode512Bloc(hash, (unsigned int *)current);
-	}
-	padding(current, len - index);
-	shaEncode512Bloc(hash, (unsigned int *)current);
+	shaPadding(current, len - index, hash);
 }
 
 int sha256Router(char **argv) {
@@ -55,7 +46,21 @@ int sha256Router(char **argv) {
 
 	options(argv, &message, &opt);
 	shaInitHash(&hash);
-	shaGetFd(0, &hash);
-	shaPrintHash(&hash);
+	if (message) {
+		shaGetArg(message, &hash);
+	} else {
+		int fd = 0;
+		if (opt.arg && opt.arg[0]) {
+			if ((fd = open(opt.arg[0], O_RDONLY)) < 0) {
+				ft_dprintf(2, "ERROR: Can't open file `%s'\n", opt.arg[0]);
+				exit(1);
+			}
+		}
+		ft_printf("%d\n", fd);
+		shaGetFd(fd, &hash);
+	}
+	if (!ft_tabfind(opt.opt, "-q")) {
+		shaPrintHash(&hash);
+	}
 	return 0;
 }

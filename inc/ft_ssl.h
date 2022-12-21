@@ -19,12 +19,13 @@ typedef struct		s_hash
 // md5
 int md5Router(char **argv);
 void initHash(t_hash *hash);
-void padding(unsigned char *message, size_t full_len);
+void md5Padding(unsigned char *message, size_t full_len, t_hash *hash);
 void encode512bloc(t_hash *hash, unsigned int *message);
 
 // sha256
 int sha256Router(char **argv);
 void shaInitHash(t_hash *hash);
+void shaPadding(unsigned char *message, size_t full_len, t_hash *hash);
 void shaEncode512Bloc(t_hash *hash, unsigned int *message);
 void shaPrintHash(t_hash *hash);
 
@@ -33,5 +34,7 @@ char *printHash(t_hash *hash);
 void print_bits(unsigned char *str, size_t len);
 
 int options(char **argv, char **message, t_optpars *ret);
+unsigned int swap32(unsigned int num);
+size_t swap64(size_t val);
 
 #endif

@@ -21,12 +21,7 @@ void md5GetFd(int fd, t_hash *hash) {
 		}
 		size += len;
 	}
-	if (size % 64 > 56) {
-		encode512bloc(hash, (unsigned int *)input);
-	}
-	padding(input, size);
-	print_bits(input, 64);
-	encode512bloc(hash, (unsigned int *)input);
+	md5Padding(input, size, hash);
 }
 
 void md5GetArg(char *message, t_hash *hash) {
@@ -41,11 +36,7 @@ void md5GetArg(char *message, t_hash *hash) {
 	}
 	bzero(current, 64);
 	ft_memcpy(current, message, len - index);
-	if (len - index > 56) {
-		encode512bloc(hash, (unsigned int *)current);
-	}
-	padding(current, len - index);
-	encode512bloc(hash, (unsigned int *)current);
+	md5Padding(current, len - index, hash);
 }
 
 int md5Router(char **argv) {
@@ -55,8 +46,6 @@ int md5Router(char **argv) {
 
 	options(argv, &message, &opt);
 	initHash(&hash);
-	ft_printf("File: %p\n", opt.arg[0]);
-	ft_printf("Message: %p\n", message);
 	if (message) {
 		md5GetArg(message, &hash);
 	} else {

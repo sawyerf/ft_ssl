@@ -27,3 +27,17 @@ int options(char **argv, char **message, t_optpars *ret) {
 	opt_parser(opt, argv, ret, "ft_ssl");
 	opt_free(&opt);
 }
+
+unsigned int swap32(unsigned int num) {
+	return ((num>>24)&0xff) | // move byte 3 to byte 0
+        ((num<<8)&0xff0000) | // move byte 1 to byte 2
+        ((num>>8)&0xff00) | // move byte 2 to byte 1
+        ((num<<24)&0xff000000); // byte 0 to byte 3
+}
+
+size_t swap64(size_t val)
+{
+    val = ((val << 8) & 0xFF00FF00FF00FF00ULL ) | ((val >> 8) & 0x00FF00FF00FF00FFULL );
+    val = ((val << 16) & 0xFFFF0000FFFF0000ULL ) | ((val >> 16) & 0x0000FFFF0000FFFFULL );
+    return (val << 32) | (val >> 32);
+}

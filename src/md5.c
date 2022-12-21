@@ -26,28 +26,24 @@ void initHash(t_hash *hash) {
 	hash->H4 = 0x10325476;
 }
 
-void padding(unsigned char *message, size_t full_len) {
+void md5Padding(unsigned char *message, size_t full_len, t_hash *hash) {
 	size_t end = full_len % 64;
 
-	if (end > 56) {
-		end = 0;
-	}
 	message[end] = 0x80;
+	if (end >= 56) {
+		encode512bloc(hash, (unsigned int*)message);
+		bzero(message, 64);
+	} else {
+		bzero(message + end + 1, 64 - end - 1);
+	}
 	full_len *= 8;
-	bzero(message + end + 1, 64 - end - 1);
 	ft_memcpy(message + 56, &full_len, 8);
+	encode512bloc(hash, (unsigned int*)message);
 }
 
 unsigned int leftRotate(unsigned int n, unsigned int d)
 {
 	return (n << d)|(n >> (32 - d));
-}
-
-unsigned int toLittleEndian32(unsigned int num) {
-	return ((num>>24)&0xff) | // move byte 3 to byte 0
-        ((num<<8)&0xff0000) | // move byte 1 to byte 2
-        ((num>>8)&0xff00) | // move byte 2 to byte 1
-        ((num<<24)&0xff000000); // byte 0 to byte 3
 }
 
 // &  (bitwise AND)
@@ -65,7 +61,7 @@ void encode512bloc(t_hash *hash, unsigned int *message) {
 	unsigned int G = 0;
 	unsigned int temp = 0;
 
-	// print_bits((unsigned char*)message, 64);
+	print_bits((unsigned char*)message, 64);
 	for (unsigned int index = 0; index < 64; index++) {
 		if (0 <= index && index <= 15) {
 			F = (B & C) | ((~B) & D);
@@ -94,9 +90,9 @@ void encode512bloc(t_hash *hash, unsigned int *message) {
 
 char *printHash(t_hash *hash) {
 	ft_printf("%08x%08x%08x%08x\n",
-		toLittleEndian32(hash->H1),
-		toLittleEndian32(hash->H2),
-		toLittleEndian32(hash->H3),
-		toLittleEndian32(hash->H4)
+		swap32(hash->H1),
+		swap32(hash->H2),
+		swap32(hash->H3),
+		swap32(hash->H4)
 	);
 }
