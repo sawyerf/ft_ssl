@@ -1,6 +1,6 @@
 #include "ft_ssl.h"
 
-unsigned int K[] = {
+unsigned int KK[] = {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
 	0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
 	0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
@@ -9,9 +9,9 @@ unsigned int K[] = {
 	0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
 	0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
 	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2	
-}
+};
 
-void initSha256Hash(t_shaHash *hash) {
+void shaInitHash(t_hash *hash) {
 	hash->H0 = 0x6a09e667;
 	hash->H1 = 0xbb67ae85;
 	hash->H2 = 0x3c6ef372;
@@ -22,16 +22,13 @@ void initSha256Hash(t_shaHash *hash) {
 	hash->H7 = 0x5be0cd19;
 }
 
-void shaPadding(t_shaHash *hash, size_t full_len) {
-	size_t end = full_len % 64;
+unsigned int rightRotate(unsigned int n, unsigned int d) {
+	// return (n << d)|(n >> (32 - d));
+	return (n >> d) || (n << (32 -d));
+}
 
-	if (end > 56) {
-		end = 0;
-	}
-	message[end] = 0x80;
-	full_len *= 8;
-	bzero(message + end + 1, 64 - end - 1);
-	ft_memcpy(message + 56, &full_len, 8);
+unsigned int rightShift(unsigned int n, unsigned int d) {
+	return (n >> d);
 }
 
 // &  (bitwise AND)
@@ -40,27 +37,27 @@ void shaPadding(t_shaHash *hash, size_t full_len) {
 // << (left shift)
 // >> (right shift)
 // ~  (bitwise NOT)
-void shaEncode512Bloc(t_shaHash *hash, unsigned int *message) {
-	unsigned int A = hash->H0;
-	unsigned int B = hash->H1;
-	unsigned int C = hash->H2;
-	unsigned int D = hash->H3;
-	unsigned int E = hash->H4;
-	unsigned int F = hash->H5;
-	unsigned int G = hash->H6;
-	unsigned int H = hash->H7;
+void shaEncode512Bloc(t_hash *hash, unsigned int *message) {
+	unsigned int A = hash->H0;
+	unsigned int B = hash->H1;
+	unsigned int C = hash->H2;
+	unsigned int D = hash->H3;
+	unsigned int E = hash->H4;
+	unsigned int F = hash->H5;
+	unsigned int G = hash->H6;
+	unsigned int H = hash->H7;
 	unsigned int S0, S1, temp1, temp2, CH, maj;
 
 	for (unsigned int index = 16; index < 64; index++) {
-		S0 = rightRotate(message[index - 15], 7) ^ rightRotate(message[index - 15]) ^ rightShift(message[index - 15], 3);
-		S1 = rightRotate(message[index - 2]) ^ rightRotate(message[i - 2], 19) ^ rightShift(message[i - 2], 10);
+		S0 = rightRotate(message[index - 15], 7) ^ rightRotate(message[index - 15], 18) ^ rightShift(message[index - 15], 3);
+		S1 = rightRotate(message[index - 2], 7) ^ rightRotate(message[index - 2], 19) ^ rightShift(message[index - 2], 10);
 		message[index] = message[index - 16] + S0 + message[index - 7] + S1;
 	}
 
 	for (unsigned int index = 0; index < 64; index++) {
 		S1 = rightRotate(E, 6) ^ rightRotate(E, 11) ^ rightRotate(E, 25);
 		CH = (E & F) ^ ((~E) & G);
-		temp1 = H + S1 + CH + K[I] + message[I];
+		temp1 = H + S1 + CH + KK[index] + message[index];
 		S0 = rightRotate(A, 2) ^ rightRotate(A,13) ^ rightRotate(A, 22);
 		maj = (A & B) ^ (A & C) ^ (B & C);
 		temp2 = S0 + maj;
@@ -74,18 +71,18 @@ void shaEncode512Bloc(t_shaHash *hash, unsigned int *message) {
 		B = A;
 		A = temp1 + temp2;
 	}
-	hash->H0 += A
-	hash->H1 += B
-	hash->H2 += C
-	hash->H3 += D
-	hash->H4 += E
-	hash->H5 += F
-	hash->H6 += G
-	hash->H7 += H
+	hash->H0 += A;
+	hash->H1 += B;
+	hash->H2 += C;
+	hash->H3 += D;
+	hash->H4 += E;
+	hash->H5 += F;
+	hash->H6 += G;
+	hash->H7 += H;
 }
 
-void printshaHash(t_shaHash *hash) {
-	print("%8x%8x%8x%8x%8x%8x%8x",
+void shaPrintHash(t_hash *hash) {
+	ft_printf("%8x%8x%8x%8x%8x%8x%8x",
 		hash->H0,
 		hash->H1,
 		hash->H2,
@@ -94,5 +91,5 @@ void printshaHash(t_shaHash *hash) {
 		hash->H5,
 		hash->H6,
 		hash->H7
-	)
+	);
 }

@@ -3,7 +3,7 @@
 #include <sys/stat.h>
 #include <fcntl.h> 
 
-void getFd(int fd, t_hash *hash) {
+void md5GetFd(int fd, t_hash *hash) {
 	size_t len;
 	size_t size = 0;
 	unsigned char input[64];
@@ -29,7 +29,7 @@ void getFd(int fd, t_hash *hash) {
 	encode512bloc(hash, (unsigned int *)input);
 }
 
-void getArg(char *message, t_hash *hash) {
+void md5GetArg(char *message, t_hash *hash) {
 	size_t	len = ft_strlen(message);
 	size_t	index = 0;
 	unsigned char	current[64];
@@ -58,7 +58,7 @@ int md5Router(char **argv) {
 	ft_printf("File: %p\n", opt.arg[0]);
 	ft_printf("Message: %p\n", message);
 	if (message) {
-		getArg(message, &hash);
+		md5GetArg(message, &hash);
 	} else {
 		int fd = 0;
 		if (opt.arg && opt.arg[0]) {
@@ -68,7 +68,7 @@ int md5Router(char **argv) {
 			}
 		}
 		ft_printf("%d\n", fd);
-		getFd(fd, &hash);
+		md5GetFd(fd, &hash);
 	}
 	if (!ft_tabfind(opt.opt, "-q")) {
 		printHash(&hash);

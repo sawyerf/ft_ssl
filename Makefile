@@ -10,6 +10,7 @@ SRC_DIR =	src
 
 SRC_FILE =	main.c \
 			md5.c \
+			sha256.c \
 			utils.c \
 			md5Router.c \
 			sha256Router.c \

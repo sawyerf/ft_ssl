@@ -6,14 +6,7 @@
 
 typedef struct		s_hash
 {
-	unsigned int	H1;
-	unsigned int	H2;
-	unsigned int	H3;
-	unsigned int	H4;
-}					t_hash;
-
-typedef struct		s_shaHash
-{
+	unsigned int	H0;
 	unsigned int	H1;
 	unsigned int	H2;
 	unsigned int	H3;
@@ -21,7 +14,7 @@ typedef struct		s_shaHash
 	unsigned int	H5;
 	unsigned int	H6;
 	unsigned int	H7;
-}					t_shaHash;
+}					t_hash;
 
 // md5
 int md5Router(char **argv);
@@ -31,6 +24,9 @@ void encode512bloc(t_hash *hash, unsigned int *message);
 
 // sha256
 int sha256Router(char **argv);
+void shaInitHash(t_hash *hash);
+void shaEncode512Bloc(t_hash *hash, unsigned int *message);
+void shaPrintHash(t_hash *hash);
 
 // Print
 char *printHash(t_hash *hash);
