@@ -12,6 +12,10 @@ SRC_FILE =	main.c \
 			utils.c \
 			md5.c \
 			md5Router.c \
+			sha224.c \
+			sha224Router.c \
+			sha384.c \
+			sha384Router.c \
 			sha256.c \
 			sha256Router.c \
 			sha512.c \

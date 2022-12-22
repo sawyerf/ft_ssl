@@ -13,7 +13,7 @@ void sha512GetFd(int fd, t_hash64 *hash) {
 	while ((len = read(fd, buffer, 128)) > 0) {
 		if ((size % 128) + len >= 64) {
 			ft_memcpy(input + (size % 128), buffer, 64 - (size % 64));
-			sha512EncodeBloc(hash, (unsigned int *)input);
+			sha512EncodeBloc(hash, (unsigned long *)input);
 			bzero(input, 128);
 			ft_memcpy(input, buffer + (128 - (size % 64)), len - (64 - (size % 64)));
 		} else {
@@ -30,7 +30,7 @@ void sha512GetArg(char *message, t_hash64 *hash) {
 	unsigned char	current[128];
 
 	while (len - index >= 128) {
-		sha512EncodeBloc(hash, (unsigned int*)message);
+		sha512EncodeBloc(hash, (unsigned long*)message);
 		message += 128;
 		index += 128;
 	}
@@ -56,7 +56,6 @@ int sha512Router(char **argv) {
 				exit(1);
 			}
 		}
-		ft_printf("%d\n", fd);
 		sha512GetFd(fd, &hash);
 	}
 	if (!ft_tabfind(opt.opt, "-q")) {
