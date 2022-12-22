@@ -16,25 +16,48 @@ typedef struct		s_hash
 	unsigned int	H7;
 }					t_hash;
 
+typedef struct		s_hash64
+{
+	unsigned long	H0;
+	unsigned long	H1;
+	unsigned long	H2;
+	unsigned long	H3;
+	unsigned long	H4;
+	unsigned long	H5;
+	unsigned long	H6;
+	unsigned long	H7;
+}					t_hash64;
+
 // md5
-int md5Router(char **argv);
-void initHash(t_hash *hash);
+int  md5Router(char **argv);
+void md5InitHash(t_hash *hash);
 void md5Padding(unsigned char *message, size_t full_len, t_hash *hash);
-void encode512bloc(t_hash *hash, unsigned int *message);
+void md5EncodeBloc(t_hash *hash, unsigned int *message);
+void md5PrintHash(t_hash *hash);
 
 // sha256
-int sha256Router(char **argv);
-void shaInitHash(t_hash *hash);
-void shaPadding(unsigned char *message, size_t full_len, t_hash *hash);
-void shaEncode512Bloc(t_hash *hash, unsigned int *message);
-void shaPrintHash(t_hash *hash);
+int  sha256Router(char **argv);
+void sha256InitHash(t_hash *hash);
+void sha256Padding(unsigned char *message, size_t full_len, t_hash *hash);
+void sha256EncodeBloc(t_hash *hash, unsigned int *message);
+void sha256PrintHash(t_hash *hash);
+
+// sha256
+int  sha512Router(char **argv);
+void sha512InitHash(t_hash64 *hash);
+void sha512Padding(unsigned char *message, size_t full_len, t_hash64 *hash);
+void sha512EncodeBloc(t_hash64 *hash, unsigned long *message);
+void sha512PrintHash(t_hash64 *hash);
 
 // Print
-char *printHash(t_hash *hash);
 void print_bits(unsigned char *str, size_t len);
 
 int options(char **argv, char **message, t_optpars *ret);
 unsigned int swap32(unsigned int num);
 size_t swap64(size_t val);
+unsigned int leftRotate(unsigned int n, unsigned int d);
+unsigned int rightRotate(unsigned int n, unsigned int d);
+unsigned int rightShift(unsigned int n, unsigned int d);
+unsigned long rightRotate64(unsigned long n, unsigned long d);
 
 #endif

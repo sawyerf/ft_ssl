@@ -12,7 +12,7 @@ unsigned int KK[] = {
 	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2	
 };
 
-void shaInitHash(t_hash *hash) {
+void sha256InitHash(t_hash *hash) {
 	hash->H0 = 0x6a09e667;
 	hash->H1 = 0xbb67ae85;
 	hash->H2 = 0x3c6ef372;
@@ -23,20 +23,12 @@ void shaInitHash(t_hash *hash) {
 	hash->H7 = 0x5be0cd19;
 }
 
-unsigned int rightRotate(unsigned int n, unsigned int d) {
-	return (n >> d) | (n << (32 - d));
-}
-
-unsigned int rightShift(unsigned int n, unsigned int d) {
-	return (n >> d);
-}
-
-void shaPadding(unsigned char *message, size_t full_len, t_hash *hash) {
+void sha256Padding(unsigned char *message, size_t full_len, t_hash *hash) {
 	size_t end = full_len % 64;
 
 	message[end] = 0x80;
 	if (end >= 56) {
-		shaEncode512Bloc(hash, (unsigned int*)message);
+		sha256EncodeBloc(hash, (unsigned int*)message);
 		bzero(message, 64);
 	} else {
 		bzero(message + end + 1, 64 - end - 1);
@@ -44,7 +36,7 @@ void shaPadding(unsigned char *message, size_t full_len, t_hash *hash) {
 	full_len *= 8;
 	full_len = swap64(full_len);
 	ft_memcpy(message + 56, &full_len, 8);
-	shaEncode512Bloc(hash, (unsigned int*)message);
+	sha256EncodeBloc(hash, (unsigned int*)message);
 }
 
 // &  (bitwise AND)
@@ -53,7 +45,7 @@ void shaPadding(unsigned char *message, size_t full_len, t_hash *hash) {
 // << (left shift)
 // >> (right shift)
 // ~  (bitwise NOT)
-void shaEncode512Bloc(t_hash *hash, unsigned int *W) {
+void sha256EncodeBloc(t_hash *hash, unsigned int *W) {
 	unsigned int A = hash->H0;
 	unsigned int B = hash->H1;
 	unsigned int C = hash->H2;
@@ -65,19 +57,16 @@ void shaEncode512Bloc(t_hash *hash, unsigned int *W) {
 	unsigned int S0, S1, temp1, temp2, CH, maj;
 	unsigned int message[64];
 
-	// ft_memcpy(message, W, 64);
 	for (unsigned int index = 0; index < 16; index++) {
 		message[index] = swap32(W[index]);
 	}
 	ft_bzero(message + 16, 192);
-	// print_bits((unsigned char*)message, 256);
 	for (unsigned int index = 16; index < 64; index++) {
 		S0 = rightRotate(message[index - 15], 7) ^ rightRotate(message[index - 15], 18) ^ rightShift(message[index - 15], 3);
 		S1 = rightRotate(message[index - 2], 17) ^ rightRotate(message[index - 2], 19) ^ rightShift(message[index - 2], 10);
 		message[index] = message[index - 16] + S0 + message[index - 7] + S1;
 	}
 
-	// print_bits((unsigned char*)message, 256);
 	for (unsigned int index = 0; index < 64; index++) {
 		S1 = rightRotate(E, 6) ^ rightRotate(E, 11) ^ rightRotate(E, 25);
 		CH = (E & F) ^ ((~E) & G);
@@ -105,8 +94,8 @@ void shaEncode512Bloc(t_hash *hash, unsigned int *W) {
 	hash->H7 += H;
 }
 
-void shaPrintHash(t_hash *hash) {
-	ft_printf("%08x %08x %08x %08x %08x %08x %08x %08x\n",
+void sha256PrintHash(t_hash *hash) {
+	ft_printf("%08x%08x%08x%08x%08x%08x%08x%08x\n",
 		hash->H0,
 		hash->H1,
 		hash->H2,

@@ -19,7 +19,7 @@ unsigned int K[] = {
 	0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
 };
 
-void initHash(t_hash *hash) {
+void md5InitHash(t_hash *hash) {
 	hash->H1 = 0x67452301;
 	hash->H2 = 0xefcdab89;
 	hash->H3 = 0x98badcfe;
@@ -31,19 +31,14 @@ void md5Padding(unsigned char *message, size_t full_len, t_hash *hash) {
 
 	message[end] = 0x80;
 	if (end >= 56) {
-		encode512bloc(hash, (unsigned int*)message);
+		md5EncodeBloc(hash, (unsigned int*)message);
 		bzero(message, 64);
 	} else {
 		bzero(message + end + 1, 64 - end - 1);
 	}
 	full_len *= 8;
 	ft_memcpy(message + 56, &full_len, 8);
-	encode512bloc(hash, (unsigned int*)message);
-}
-
-unsigned int leftRotate(unsigned int n, unsigned int d)
-{
-	return (n << d)|(n >> (32 - d));
+	md5EncodeBloc(hash, (unsigned int*)message);
 }
 
 // &  (bitwise AND)
@@ -52,7 +47,7 @@ unsigned int leftRotate(unsigned int n, unsigned int d)
 // << (left shift)
 // >> (right shift)
 // ~  (bitwise NOT)
-void encode512bloc(t_hash *hash, unsigned int *message) {
+void md5EncodeBloc(t_hash *hash, unsigned int *message) {
 	unsigned int A = hash->H1;
 	unsigned int B = hash->H2;
 	unsigned int C = hash->H3;
@@ -61,7 +56,6 @@ void encode512bloc(t_hash *hash, unsigned int *message) {
 	unsigned int G = 0;
 	unsigned int temp = 0;
 
-	print_bits((unsigned char*)message, 64);
 	for (unsigned int index = 0; index < 64; index++) {
 		if (0 <= index && index <= 15) {
 			F = (B & C) | ((~B) & D);
@@ -88,7 +82,7 @@ void encode512bloc(t_hash *hash, unsigned int *message) {
 	hash->H4 += D;
 }
 
-char *printHash(t_hash *hash) {
+void md5PrintHash(t_hash *hash) {
 	ft_printf("%08x%08x%08x%08x\n",
 		swap32(hash->H1),
 		swap32(hash->H2),

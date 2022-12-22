@@ -3,7 +3,7 @@
 #include <sys/stat.h>
 #include <fcntl.h> 
 
-void shaGetFd(int fd, t_hash *hash) {
+void sha256GetFd(int fd, t_hash *hash) {
 	size_t len;
 	size_t size = 0;
 	unsigned char input[64];
@@ -13,7 +13,7 @@ void shaGetFd(int fd, t_hash *hash) {
 	while ((len = read(fd, buffer, 64)) > 0) {
 		if ((size % 64) + len >= 64) {
 			ft_memcpy(input + (size % 64), buffer, 64 - (size % 64));
-			shaEncode512Bloc(hash, (unsigned int *)input);
+			sha256EncodeBloc(hash, (unsigned int *)input);
 			bzero(input, 64);
 			ft_memcpy(input, buffer + (64 - (size % 64)), len - (64 - (size % 64)));
 		} else {
@@ -21,22 +21,22 @@ void shaGetFd(int fd, t_hash *hash) {
 		}
 		size += len;
 	}
-	shaPadding(input, size, hash);
+	sha256Padding(input, size, hash);
 }
 
-void shaGetArg(char *message, t_hash *hash) {
+void sha256GetArg(char *message, t_hash *hash) {
 	size_t	len = ft_strlen(message);
 	size_t	index = 0;
 	unsigned char	current[64];
 
 	while (len - index >= 64) {
-		shaEncode512Bloc(hash, (unsigned int*)message);
+		sha256EncodeBloc(hash, (unsigned int*)message);
 		message += 64;
 		index += 64;
 	}
 	bzero(current, 64);
 	ft_memcpy(current, message, len - index);
-	shaPadding(current, len - index, hash);
+	sha256Padding(current, len - index, hash);
 }
 
 int sha256Router(char **argv) {
@@ -45,9 +45,9 @@ int sha256Router(char **argv) {
 	t_hash	hash;
 
 	options(argv, &message, &opt);
-	shaInitHash(&hash);
+	sha256InitHash(&hash);
 	if (message) {
-		shaGetArg(message, &hash);
+		sha256GetArg(message, &hash);
 	} else {
 		int fd = 0;
 		if (opt.arg && opt.arg[0]) {
@@ -57,10 +57,10 @@ int sha256Router(char **argv) {
 			}
 		}
 		ft_printf("%d\n", fd);
-		shaGetFd(fd, &hash);
+		sha256GetFd(fd, &hash);
 	}
 	if (!ft_tabfind(opt.opt, "-q")) {
-		shaPrintHash(&hash);
+		sha256PrintHash(&hash);
 	}
 	return 0;
 }

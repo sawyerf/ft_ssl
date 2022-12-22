@@ -13,7 +13,7 @@ void md5GetFd(int fd, t_hash *hash) {
 	while ((len = read(fd, buffer, 64)) > 0) {
 		if ((size % 64) + len >= 64) {
 			ft_memcpy(input + (size % 64), buffer, 64 - (size % 64));
-			encode512bloc(hash, (unsigned int *)input);
+			md5EncodeBloc(hash, (unsigned int *)input);
 			bzero(input, 64);
 			ft_memcpy(input, buffer + (64 - (size % 64)), len - (64 - (size % 64)));
 		} else {
@@ -30,7 +30,7 @@ void md5GetArg(char *message, t_hash *hash) {
 	unsigned char	current[64];
 
 	while (len - index >= 64) {
-		encode512bloc(hash, (unsigned int*)message);
+		md5EncodeBloc(hash, (unsigned int*)message);
 		message += 64;
 		index += 64;
 	}
@@ -45,7 +45,7 @@ int md5Router(char **argv) {
 	t_hash	hash;
 
 	options(argv, &message, &opt);
-	initHash(&hash);
+	md5InitHash(&hash);
 	if (message) {
 		md5GetArg(message, &hash);
 	} else {
@@ -55,12 +55,12 @@ int md5Router(char **argv) {
 				ft_dprintf(2, "ERROR: Can't open file `%s'\n", opt.arg[0]);
 				exit(1);
 			}
+		} else {
 		}
-		ft_printf("%d\n", fd);
 		md5GetFd(fd, &hash);
 	}
 	if (!ft_tabfind(opt.opt, "-q")) {
-		printHash(&hash);
+		md5PrintHash(&hash);
 	}
 	return 0;
 }

@@ -9,11 +9,13 @@ INC_FILE =	ft_ssl.h
 SRC_DIR =	src
 
 SRC_FILE =	main.c \
-			md5.c \
-			sha256.c \
 			utils.c \
+			md5.c \
 			md5Router.c \
+			sha256.c \
 			sha256Router.c \
+			sha512.c \
+			sha512Router.c \
 
 CFLAGS =	-I $(INC_DIR) -I libft/inc/ -g # -Wall -g -lm -Werror -Wextra
 
