@@ -24,8 +24,7 @@ void shaInitHash(t_hash *hash) {
 }
 
 unsigned int rightRotate(unsigned int n, unsigned int d) {
-	// return (n << d)|(n >> (32 - d));
-	return (n >> d) || (n << (32 - d));
+	return (n >> d) | (n << (32 - d));
 }
 
 unsigned int rightShift(unsigned int n, unsigned int d) {
@@ -66,15 +65,19 @@ void shaEncode512Bloc(t_hash *hash, unsigned int *W) {
 	unsigned int S0, S1, temp1, temp2, CH, maj;
 	unsigned int message[64];
 
-	ft_memcpy(message, W, 64);
+	// ft_memcpy(message, W, 64);
+	for (unsigned int index = 0; index < 16; index++) {
+		message[index] = swap32(W[index]);
+	}
 	ft_bzero(message + 16, 192);
-	print_bits((unsigned char *)message, 64);
+	// print_bits((unsigned char*)message, 256);
 	for (unsigned int index = 16; index < 64; index++) {
 		S0 = rightRotate(message[index - 15], 7) ^ rightRotate(message[index - 15], 18) ^ rightShift(message[index - 15], 3);
 		S1 = rightRotate(message[index - 2], 17) ^ rightRotate(message[index - 2], 19) ^ rightShift(message[index - 2], 10);
 		message[index] = message[index - 16] + S0 + message[index - 7] + S1;
 	}
 
+	// print_bits((unsigned char*)message, 256);
 	for (unsigned int index = 0; index < 64; index++) {
 		S1 = rightRotate(E, 6) ^ rightRotate(E, 11) ^ rightRotate(E, 25);
 		CH = (E & F) ^ ((~E) & G);
@@ -103,7 +106,7 @@ void shaEncode512Bloc(t_hash *hash, unsigned int *W) {
 }
 
 void shaPrintHash(t_hash *hash) {
-	ft_printf("%08x %08x %08x %08x %08x %08x %08x\n",
+	ft_printf("%08x %08x %08x %08x %08x %08x %08x %08x\n",
 		hash->H0,
 		hash->H1,
 		hash->H2,
@@ -112,15 +115,5 @@ void shaPrintHash(t_hash *hash) {
 		hash->H5,
 		hash->H6,
 		hash->H7
-	);
-	ft_printf("%08x %08x %08x %08x %08x %08x %08x\n",
-		swap32(hash->H0),
-		swap32(hash->H1),
-		swap32(hash->H2),
-		swap32(hash->H3),
-		swap32(hash->H4),
-		swap32(hash->H5),
-		swap32(hash->H6),
-		swap32(hash->H7)
 	);
 }
