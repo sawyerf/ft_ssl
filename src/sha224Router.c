@@ -24,7 +24,7 @@ int sha224Router(char **argv) {
 		sha256GetFd(fd, &hash);
 	}
 	if (!ft_tabfind(opt.opt, "-q")) {
-		sha256PrintHash(&hash);
+		sha224PrintHash(&hash);
 	}
 	return 0;
 }

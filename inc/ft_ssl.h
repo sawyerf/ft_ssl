@@ -38,6 +38,7 @@ void md5PrintHash(t_hash *hash);
 // sha224
 int  sha224Router(char **argv);
 void sha224InitHash(t_hash *hash);
+void sha224PrintHash(t_hash *hash);
 
 // sha256
 int  sha256Router(char **argv);

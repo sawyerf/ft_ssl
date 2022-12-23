@@ -11,11 +11,11 @@ void sha512GetFd(int fd, t_hash64 *hash) {
 
 	bzero(input, 128);
 	while ((len = read(fd, buffer, 128)) > 0) {
-		if ((size % 128) + len >= 64) {
-			ft_memcpy(input + (size % 128), buffer, 64 - (size % 64));
+		if ((size % 128) + len >= 128) {
+			ft_memcpy(input + (size % 128), buffer, 128 - (size % 128));
 			sha512EncodeBloc(hash, (unsigned long *)input);
 			bzero(input, 128);
-			ft_memcpy(input, buffer + (128 - (size % 64)), len - (64 - (size % 64)));
+			ft_memcpy(input, buffer + (128 - (size % 128)), len - (128 - (size % 128)));
 		} else {
 			ft_memcpy(input + (size % 128), buffer, len);
 		}
