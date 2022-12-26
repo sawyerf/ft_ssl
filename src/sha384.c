@@ -13,7 +13,7 @@ void sha384InitHash(t_hash64 *hash) {
 }
 
 void sha384PrintHash(t_hash64 *hash) {
-	ft_printf("SHA512(stdin)= %016lx%016lx%016lx%016lx%016lx%016lx\n",
+	ft_printf("%016lx%016lx%016lx%016lx%016lx%016lx",
 		hash->H0,
 		hash->H1,
 		hash->H2,

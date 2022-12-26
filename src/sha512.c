@@ -103,7 +103,7 @@ void sha512EncodeBloc(t_hash64 *hash, unsigned long *W) {
 }
 
 void sha512PrintHash(t_hash64 *hash) {
-	ft_printf("SHA512(stdin)= %016lx%016lx%016lx%016lx%016lx%016lx%016lx%016lx\n",
+	ft_printf("%016lx%016lx%016lx%016lx%016lx%016lx%016lx%016lx",
 		hash->H0,
 		hash->H1,
 		hash->H2,

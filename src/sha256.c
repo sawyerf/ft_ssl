@@ -95,7 +95,7 @@ void sha256EncodeBloc(t_hash *hash, unsigned int *W) {
 }
 
 void sha256PrintHash(t_hash *hash) {
-	ft_printf("%08x%08x%08x%08x%08x%08x%08x%08x\n",
+	ft_printf("%08x%08x%08x%08x%08x%08x%08x%08x",
 		hash->H0,
 		hash->H1,
 		hash->H2,

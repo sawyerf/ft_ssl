@@ -12,7 +12,7 @@ void sha224InitHash(t_hash *hash) {
 }
 
 void sha224PrintHash(t_hash *hash) {
-	ft_printf("%08x%08x%08x%08x%08x%08x%08x\n",
+	ft_printf("%08x%08x%08x%08x%08x%08x%08x",
 		hash->H0,
 		hash->H1,
 		hash->H2,

@@ -83,7 +83,7 @@ void md5EncodeBloc(t_hash *hash, unsigned int *message) {
 }
 
 void md5PrintHash(t_hash *hash) {
-	ft_printf("%08x%08x%08x%08x\n",
+	ft_printf("%08x%08x%08x%08x",
 		swap32(hash->H1),
 		swap32(hash->H2),
 		swap32(hash->H3),

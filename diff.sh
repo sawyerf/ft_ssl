@@ -8,7 +8,8 @@ export C_CLR=$(tput sgr0)
 
 read data
 echo -n "$C_RED"
-echo -n "$data" | ./ft_ssl $1
+echo -n "$data" > .diff
+echo -n "$data" | ./ft_ssl $1 -s "$data" -p .diff
 echo -n "$C_GREEN"
 echo -n "$data" | openssl $1
 echo -n "$C_CLR"
