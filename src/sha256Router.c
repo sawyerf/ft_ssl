@@ -43,5 +43,5 @@ void sha256GetArg(char *message, t_hash *hash) {
 }
 
 int sha256Router(char **argv) {
-	return (router(argv, &sha256GetFd, &sha256GetArg, &sha256PrintHash));
+	return (router(argv, "SHA256", &sha256GetFd, &sha256GetArg, &sha256PrintHash));
 }

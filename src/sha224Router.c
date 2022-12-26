@@ -43,5 +43,5 @@ void sha224GetArg(char *message, t_hash *hash) {
 }
 
 int sha224Router(char **argv) {
-	return (router(argv, &sha224GetFd, &sha224GetArg, &sha224PrintHash));
+	return (router(argv, "SHA224", &sha224GetFd, &sha224GetArg, &sha224PrintHash));
 }

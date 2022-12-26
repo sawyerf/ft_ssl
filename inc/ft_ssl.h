@@ -72,8 +72,8 @@ void sha512GetFd(int fd, t_hash64 *hash, int isPrint);
 void sha512GetArg(char *message, t_hash64 *hash);
 
 // router
-int router(char **argv, t_getFd getFd, t_getArg getArg, t_printHash printHash);
-int router64(char **argv, t_getFd64 getFd, t_getArg64 getArg, t_printHash64 printHash);
+int router(char **argv, char *algo, t_getFd getFd, t_getArg getArg, t_printHash printHash);
+int router64(char **argv, char *algo, t_getFd64 getFd, t_getArg64 getArg, t_printHash64 printHash);
 
 // Print
 void print_bits(unsigned char *str, size_t len);

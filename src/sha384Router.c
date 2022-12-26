@@ -43,5 +43,5 @@ void sha384GetArg(char *message, t_hash64 *hash) {
 }
 
 int sha384Router(char **argv) {
-	return (router64(argv, &sha384GetFd, &sha384GetArg, &sha384PrintHash));
+	return (router64(argv, "SHA384", &sha384GetFd, &sha384GetArg, &sha384PrintHash));
 }

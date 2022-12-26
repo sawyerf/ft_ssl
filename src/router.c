@@ -4,7 +4,7 @@
 #include <fcntl.h> 
 
 
-int router(char **argv, t_getFd getFd, t_getArg getArg, t_printHash printHash) {
+int router(char **argv, char *algo, t_getFd getFd, t_getArg getArg, t_printHash printHash) {
 	char	*message = NULL;
 	t_optpars opt;
 	t_hash	hash;
@@ -13,14 +13,14 @@ int router(char **argv, t_getFd getFd, t_getArg getArg, t_printHash printHash) {
 	options(argv, &message, &opt);
 	// STDIN
 	if (ft_tabfind(opt.opt, "-p")) {
-		if (!ft_tabfind(opt.opt, "-q")) ft_printf("(\"");
+		if (!ft_tabfind(opt.opt, "-q")) ft_printf("%s(\"", algo);
 		getFd(0, &hash, 1);
 		if (!ft_tabfind(opt.opt, "-q")) ft_printf("\")= ");
 		if (ft_tabfind(opt.opt, "-q")) ft_printf("\n");
 		printHash(&hash);
 		ft_printf("\n");
 	} else if ((!message && (!opt.arg))) {
-		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("(stdin)= ");
+		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(stdin)= ", algo);
 		getFd(0, &hash, 0);
 		printHash(&hash);
 		if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf(" stdin");
@@ -28,7 +28,7 @@ int router(char **argv, t_getFd getFd, t_getArg getArg, t_printHash printHash) {
 	}
 	// -s message
 	if (message) {
-		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("(\"%s\")= ", message);
+		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(\"%s\")= ", algo, message);
 		getArg(message, &hash);
 		printHash(&hash);
 		if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf(" \"%s\"", message);
@@ -41,7 +41,7 @@ int router(char **argv, t_getFd getFd, t_getArg getArg, t_printHash printHash) {
 				ft_dprintf(2, "ERROR: Can't open file `%s'\n", opt.arg[index]);
 				continue;
 			}
-			if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("(%s)= ", opt.arg[index]);
+			if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(%s)= ", algo, opt.arg[index]);
 			getFd(fd, &hash, 0);
 			printHash(&hash);
 			if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf("%s", message);
@@ -51,7 +51,7 @@ int router(char **argv, t_getFd getFd, t_getArg getArg, t_printHash printHash) {
 	return 0;
 }
 
-int router64(char **argv, t_getFd64 getFd, t_getArg64 getArg, t_printHash64 printHash) {
+int router64(char **argv, char *algo, t_getFd64 getFd, t_getArg64 getArg, t_printHash64 printHash) {
 	char	*message = NULL;
 	t_optpars opt;
 	t_hash64	hash;
@@ -60,14 +60,14 @@ int router64(char **argv, t_getFd64 getFd, t_getArg64 getArg, t_printHash64 prin
 	options(argv, &message, &opt);
 	// STDIN
 	if (ft_tabfind(opt.opt, "-p")) {
-		if (!ft_tabfind(opt.opt, "-q")) ft_printf("(\"");
+		if (!ft_tabfind(opt.opt, "-q")) ft_printf("%s(\"", algo);
 		getFd(0, &hash, 1);
 		if (!ft_tabfind(opt.opt, "-q")) ft_printf("\")= ");
 		if (ft_tabfind(opt.opt, "-q")) ft_printf("\n");
 		printHash(&hash);
 		ft_printf("\n");
 	} else if ((!message && (!opt.arg))) {
-		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("(stdin)= ");
+		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(stdin)= ", algo);
 		getFd(0, &hash, 0);
 		printHash(&hash);
 		if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf(" stdin");
@@ -75,7 +75,7 @@ int router64(char **argv, t_getFd64 getFd, t_getArg64 getArg, t_printHash64 prin
 	}
 	// -s message
 	if (message) {
-		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("(\"%s\")= ", message);
+		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(\"%s\")= ", algo,  message);
 		getArg(message, &hash);
 		printHash(&hash);
 		if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf(" \"%s\"", message);
@@ -88,7 +88,7 @@ int router64(char **argv, t_getFd64 getFd, t_getArg64 getArg, t_printHash64 prin
 				ft_dprintf(2, "ERROR: Can't open file `%s'\n", opt.arg[index]);
 				continue;
 			}
-			if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("(%s)= ", opt.arg[index]);
+			if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(%s)= ", algo, opt.arg[index]);
 			getFd(fd, &hash, 0);
 			printHash(&hash);
 			if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf("%s", message);

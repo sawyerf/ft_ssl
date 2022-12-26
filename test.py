@@ -10,7 +10,10 @@ def allEqual(liste):
 
 def runCommands(algo, stdin, name):
 	open('.test', 'w').write(stdin)
-	myStdout = os.popen(f'echo -n "{stdin}" | ./ft_ssl {algo} -s "{stdin}" -p .test').read()
+	if (len(stdin) < 500):
+		myStdout = os.popen(f'echo -n "{stdin}" | ./ft_ssl {algo} -s "{stdin}" -p .test').read()
+	else:
+		myStdout = os.popen(f'cat .test | ./ft_ssl {algo} -p .test').read()
 	hisStdout = os.popen(f'echo -n "{stdin}" | openssl {algo}').read()
 
 	myHash = re.findall(r'([a-f0-9]{10,})', myStdout)
@@ -38,4 +41,4 @@ def testAlgos(stdin, name):
 for index in range(150):
 	testAlgos('A' * index, f"'A' * {index}")
 
-# testAlgos('A' * 100000 , f"'A' * 10000")
+testAlgos('A' * 100000 , f"'A' * 10000")

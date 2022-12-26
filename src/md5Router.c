@@ -43,5 +43,5 @@ void md5GetArg(char *message, t_hash *hash) {
 }
 
 int md5Router(char **argv) {
-	router(argv, &md5GetFd, &md5GetArg, &md5PrintHash);
+	router(argv, "MD5", &md5GetFd, &md5GetArg, &md5PrintHash);
 }
