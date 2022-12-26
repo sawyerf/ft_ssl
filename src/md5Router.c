@@ -39,7 +39,7 @@ void md5GetArg(char *message, t_hash *hash) {
 	}
 	bzero(current, 64);
 	ft_memcpy(current, message, len - index);
-	md5Padding(current, len - index, hash);
+	md5Padding(current, len, hash);
 }
 
 int md5Router(char **argv) {

@@ -39,32 +39,9 @@ void sha256GetArg(char *message, t_hash *hash) {
 	}
 	bzero(current, 64);
 	ft_memcpy(current, message, len - index);
-	sha256Padding(current, len - index, hash);
+	sha256Padding(current, len, hash);
 }
 
 int sha256Router(char **argv) {
-	// char	*message = NULL;
-	// t_optpars opt;
-	// t_hash	hash;
-
-	// options(argv, &message, &opt);
-	// sha256InitHash(&hash);
-	// if (message) {
-	// 	sha256GetArg(message, &hash);
-	// } else {
-	// 	int fd = 0;
-	// 	if (opt.arg && opt.arg[0]) {
-	// 		if ((fd = open(opt.arg[0], O_RDONLY)) < 0) {
-	// 			ft_dprintf(2, "ERROR: Can't open file `%s'\n", opt.arg[0]);
-	// 			exit(1);
-	// 		}
-	// 	}
-	// 	ft_printf("%d\n", fd);
-	// 	sha256GetFd(fd, &hash);
-	// }
-	// if (!ft_tabfind(opt.opt, "-q")) {
-	// 	sha256PrintHash(&hash);
-	// }
-	// return 0;
 	return (router(argv, &sha256GetFd, &sha256GetArg, &sha256PrintHash));
 }
