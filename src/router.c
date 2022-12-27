@@ -3,8 +3,7 @@
 #include <sys/stat.h>
 #include <fcntl.h> 
 
-
-int router(char **argv, char *algo, t_getFd getFd, t_getArg getArg, t_printHash printHash) {
+void router(char **argv, char *algo, t_getFd getFd, t_getArg getArg, t_printHash printHash) {
 	char	*message = NULL;
 	t_optpars opt;
 	t_hash	hash;
@@ -48,10 +47,9 @@ int router(char **argv, char *algo, t_getFd getFd, t_getArg getArg, t_printHash 
 			ft_printf("\n");
 		}
 	}
-	return 0;
 }
 
-int router64(char **argv, char *algo, t_getFd64 getFd, t_getArg64 getArg, t_printHash64 printHash) {
+void router64(char **argv, char *algo, t_getFd64 getFd, t_getArg64 getArg, t_printHash64 printHash) {
 	char	*message = NULL;
 	t_optpars opt;
 	t_hash64	hash;
@@ -95,5 +93,4 @@ int router64(char **argv, char *algo, t_getFd64 getFd, t_getArg64 getArg, t_prin
 			ft_printf("\n");
 		}
 	}
-	return 0;
 }

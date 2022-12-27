@@ -42,6 +42,6 @@ void md5GetArg(char *message, t_hash *hash) {
 	md5Padding(current, len, hash);
 }
 
-int md5Router(char **argv) {
+void md5Router(char **argv) {
 	router(argv, "MD5", &md5GetFd, &md5GetArg, &md5PrintHash);
 }

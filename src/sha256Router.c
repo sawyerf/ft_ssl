@@ -42,6 +42,6 @@ void sha256GetArg(char *message, t_hash *hash) {
 	sha256Padding(current, len, hash);
 }
 
-int sha256Router(char **argv) {
-	return (router(argv, "SHA256", &sha256GetFd, &sha256GetArg, &sha256PrintHash));
+void sha256Router(char **argv) {
+	router(argv, "SHA256", &sha256GetFd, &sha256GetArg, &sha256PrintHash);
 }

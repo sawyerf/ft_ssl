@@ -37,19 +37,19 @@ typedef void (*t_getArg64)(char *message, t_hash64 *hash);
 typedef void (*t_printHash64)(t_hash64 *hash);
 
 // md5
-int  md5Router(char **argv);
+void  md5Router(char **argv);
 void md5InitHash(t_hash *hash);
 void md5Padding(unsigned char *message, size_t full_len, t_hash *hash);
 void md5EncodeBloc(t_hash *hash, unsigned int *message);
 void md5PrintHash(t_hash *hash);
 
 // sha224
-int  sha224Router(char **argv);
+void  sha224Router(char **argv);
 void sha224InitHash(t_hash *hash);
 void sha224PrintHash(t_hash *hash);
 
 // sha256
-int  sha256Router(char **argv);
+void  sha256Router(char **argv);
 void sha256InitHash(t_hash *hash);
 void sha256Padding(unsigned char *message, size_t full_len, t_hash *hash);
 void sha256EncodeBloc(t_hash *hash, unsigned int *message);
@@ -58,12 +58,12 @@ void sha256GetFd(int fd, t_hash *hash, int isPrint);
 void sha256GetArg(char *message, t_hash *hash);
 
 // sha384
-int  sha384Router(char **argv);
+void  sha384Router(char **argv);
 void sha384InitHash(t_hash64 *hash);
 void sha384PrintHash(t_hash64 *hash);
 
 // sha512
-int  sha512Router(char **argv);
+void  sha512Router(char **argv);
 void sha512InitHash(t_hash64 *hash);
 void sha512Padding(unsigned char *message, size_t full_len, t_hash64 *hash);
 void sha512EncodeBloc(t_hash64 *hash, unsigned long *message);
@@ -72,13 +72,13 @@ void sha512GetFd(int fd, t_hash64 *hash, int isPrint);
 void sha512GetArg(char *message, t_hash64 *hash);
 
 // router
-int router(char **argv, char *algo, t_getFd getFd, t_getArg getArg, t_printHash printHash);
-int router64(char **argv, char *algo, t_getFd64 getFd, t_getArg64 getArg, t_printHash64 printHash);
+void router(char **argv, char *algo, t_getFd getFd, t_getArg getArg, t_printHash printHash);
+void router64(char **argv, char *algo, t_getFd64 getFd, t_getArg64 getArg, t_printHash64 printHash);
 
 // Print
 void print_bits(unsigned char *str, size_t len);
 
-int options(char **argv, char **message, t_optpars *ret);
+void options(char **argv, char **message, t_optpars *ret);
 unsigned int swap32(unsigned int num);
 size_t swap64(size_t val);
 unsigned int leftRotate(unsigned int n, unsigned int d);

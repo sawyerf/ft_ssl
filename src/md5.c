@@ -57,7 +57,7 @@ void md5EncodeBloc(t_hash *hash, unsigned int *message) {
 	unsigned int temp = 0;
 
 	for (unsigned int index = 0; index < 64; index++) {
-		if (0 <= index && index <= 15) {
+		if (index <= 15) {
 			F = (B & C) | ((~B) & D);
 			G = index;
 		} else if (16 <= index && index <= 31) {

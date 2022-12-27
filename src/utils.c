@@ -15,17 +15,20 @@ void print_bits(unsigned char *str, size_t len) {
 	ft_printf("\n");
 }
 
-int options(char **argv, char **message, t_optpars *ret) {
+void options(char **argv, char **message, t_optpars *optpars) {
 	t_opt	*opt;
+	unsigned char ret;
 
-	bzero(ret, sizeof(t_optpars));
+	bzero(optpars, sizeof(t_optpars));
 	opt_init(&opt);
 	opt_addvar2(&opt, "-s", (void*)message, OPT_STR);
 	opt_addvar(&opt, "-q", NULL, 0);
 	opt_addvar(&opt, "-r", NULL, 0);
 	opt_addvar(&opt, "-p", NULL, 0);
-	opt_parser(opt, argv, ret, "ft_ssl");
+	ret = opt_parser(opt, argv, optpars, "ft_ssl");
 	opt_free(&opt);
+	if (ret)
+		exit(ret);
 }
 
 unsigned int swap32(unsigned int num) {

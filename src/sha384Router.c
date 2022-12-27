@@ -42,6 +42,6 @@ void sha384GetArg(char *message, t_hash64 *hash) {
 	sha512Padding(current, len, hash);
 }
 
-int sha384Router(char **argv) {
-	return (router64(argv, "SHA384", &sha384GetFd, &sha384GetArg, &sha384PrintHash));
+void sha384Router(char **argv) {
+	router64(argv, "SHA384", &sha384GetFd, &sha384GetArg, &sha384PrintHash);
 }
