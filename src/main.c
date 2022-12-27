@@ -18,6 +18,8 @@ int main(int argc, char **argv) {
 			sha384Router(argv + 2);
 		} else if (!ft_strcmp(argv[1], "sha512")) {
 			sha512Router(argv + 2);
+		} else {
+			usage();
 		}
 	} else {
 		usage();

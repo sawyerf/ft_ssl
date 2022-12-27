@@ -23,6 +23,8 @@ void sha256InitHash(t_hash *hash) {
 	hash->H7 = 0x5be0cd19;
 }
 
+extern int isDebug;
+
 void sha256Padding(unsigned char *message, size_t full_len, t_hash *hash) {
 	size_t end = full_len % 64;
 
@@ -57,6 +59,9 @@ void sha256EncodeBloc(t_hash *hash, unsigned int *W) {
 	unsigned int S0, S1, temp1, temp2, CH, maj;
 	unsigned int message[64];
 
+	if (isDebug) ft_printf("\n=========== SHA ENCODE ===========\n");
+	if (isDebug) sha256PrintHash(hash);
+	print_bits((unsigned char *)message, 64);
 	for (unsigned int index = 0; index < 16; index++) {
 		message[index] = swap32(W[index]);
 	}
@@ -92,6 +97,7 @@ void sha256EncodeBloc(t_hash *hash, unsigned int *W) {
 	hash->H5 += F;
 	hash->H6 += G;
 	hash->H7 += H;
+	if (isDebug) ft_printf("=========== END ENCODE ===========\n");
 }
 
 void sha256PrintHash(t_hash *hash) {

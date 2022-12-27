@@ -19,6 +19,8 @@ unsigned int K[] = {
 	0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
 };
 
+extern int isDebug;
+
 void md5InitHash(t_hash *hash) {
 	hash->H1 = 0x67452301;
 	hash->H2 = 0xefcdab89;
@@ -56,6 +58,9 @@ void md5EncodeBloc(t_hash *hash, unsigned int *message) {
 	unsigned int G = 0;
 	unsigned int temp = 0;
 
+	if (isDebug) ft_printf("\n=========== MD5 ENCODE ===========\n");
+	if (isDebug) md5PrintHash(hash);
+	print_bits((unsigned char *)message, 64);
 	for (unsigned int index = 0; index < 64; index++) {
 		if (index <= 15) {
 			F = (B & C) | ((~B) & D);
@@ -80,6 +85,7 @@ void md5EncodeBloc(t_hash *hash, unsigned int *message) {
 	hash->H2 += B;
 	hash->H3 += C;
 	hash->H4 += D;
+	if (isDebug) ft_printf("=========== END ENCODE ===========\n");
 }
 
 void md5PrintHash(t_hash *hash) {

@@ -1,6 +1,8 @@
 #include "ft_ssl.h"
 #include <stdio.h>
 
+int isDebug = 0;
+
 void print_bit(unsigned char n) {
 	for (int i = 7; i >= 0; i--) {
 		ft_printf("%d", (n >> i) & 1);
@@ -9,7 +11,9 @@ void print_bit(unsigned char n) {
 }
 
 void print_bits(unsigned char *str, size_t len) {
+	if (!isDebug) return ;
 	for (size_t i = 0; i < len; i++) {
+		if (!(i % 8)) ft_printf("\n");
 		print_bit(str[i]);
 	}
 	ft_printf("\n");
@@ -25,10 +29,12 @@ void options(char **argv, char **message, t_optpars *optpars) {
 	opt_addvar(&opt, "-q", NULL, 0);
 	opt_addvar(&opt, "-r", NULL, 0);
 	opt_addvar(&opt, "-p", NULL, 0);
+	opt_addvar(&opt, "-v", NULL, 0);
 	ret = opt_parser(opt, argv, optpars, "ft_ssl");
 	opt_free(&opt);
 	if (ret)
 		exit(ret);
+	isDebug = ft_tabfind(optpars->opt, "-v") > 0;
 }
 
 unsigned int swap32(unsigned int num) {

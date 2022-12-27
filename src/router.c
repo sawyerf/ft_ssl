@@ -19,16 +19,16 @@ void router(char **argv, char *algo, t_getFd getFd, t_getArg getArg, t_printHash
 		printHash(&hash);
 		ft_printf("\n");
 	} else if ((!message && (!opt.arg))) {
-		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(stdin)= ", algo);
 		getFd(0, &hash, 0);
+		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(stdin)= ", algo);
 		printHash(&hash);
 		if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf(" stdin");
 		ft_printf("\n");
 	}
 	// -s message
 	if (message) {
-		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(\"%s\")= ", algo, message);
 		getArg(message, &hash);
+		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(\"%s\")= ", algo, message);
 		printHash(&hash);
 		if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf(" \"%s\"", message);
 		ft_printf("\n");
@@ -40,11 +40,12 @@ void router(char **argv, char *algo, t_getFd getFd, t_getArg getArg, t_printHash
 				ft_dprintf(2, "ERROR: Can't open file `%s'\n", opt.arg[index]);
 				continue;
 			}
-			if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(%s)= ", algo, opt.arg[index]);
 			getFd(fd, &hash, 0);
+			if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(%s)= ", algo, opt.arg[index]);
 			printHash(&hash);
-			if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf("%s", message);
+			if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf(" *%s", opt.arg[index]);
 			ft_printf("\n");
+			close(fd);
 		}
 	}
 }
@@ -65,16 +66,16 @@ void router64(char **argv, char *algo, t_getFd64 getFd, t_getArg64 getArg, t_pri
 		printHash(&hash);
 		ft_printf("\n");
 	} else if ((!message && (!opt.arg))) {
-		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(stdin)= ", algo);
 		getFd(0, &hash, 0);
+		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(stdin)= ", algo);
 		printHash(&hash);
 		if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf(" stdin");
 		ft_printf("\n");
 	}
 	// -s message
 	if (message) {
-		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(\"%s\")= ", algo,  message);
 		getArg(message, &hash);
+		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(\"%s\")= ", algo,  message);
 		printHash(&hash);
 		if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf(" \"%s\"", message);
 		ft_printf("\n");
@@ -86,11 +87,12 @@ void router64(char **argv, char *algo, t_getFd64 getFd, t_getArg64 getArg, t_pri
 				ft_dprintf(2, "ERROR: Can't open file `%s'\n", opt.arg[index]);
 				continue;
 			}
-			if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(%s)= ", algo, opt.arg[index]);
 			getFd(fd, &hash, 0);
+			if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(%s)= ", algo, opt.arg[index]);
 			printHash(&hash);
 			if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf("%s", message);
 			ft_printf("\n");
+			close(fd);
 		}
 	}
 }

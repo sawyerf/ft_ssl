@@ -31,6 +31,8 @@ void sha512InitHash(t_hash64 *hash) {
 	hash->H7 = 0x5be0cd19137e2179;
 }
 
+extern int isDebug;
+
 void sha512Padding(unsigned char *message, size_t full_len, t_hash64 *hash) {
 	size_t end = full_len % 128;
 
@@ -65,6 +67,8 @@ void sha512EncodeBloc(t_hash64 *hash, unsigned long *W) {
 	unsigned long S0, S1, temp1, temp2, CH, maj;
 	unsigned long message[80];
 
+	if (isDebug) ft_printf("\n=========== SHA ENCODE ===========\n");
+	if (isDebug) sha512PrintHash(hash);
 	for (unsigned long index = 0; index < 16; index++) {
 		message[index] = swap64(W[index]);
 	}
@@ -74,6 +78,7 @@ void sha512EncodeBloc(t_hash64 *hash, unsigned long *W) {
 		S1 = rightRotate64(message[index - 2], 19) ^ rightRotate64(message[index - 2], 61) ^ (message[index - 2]  >> 6);
 		message[index] = message[index - 16] + S0 + message[index - 7] + S1;
 	}
+	print_bits((unsigned char *)message, 128);
 
 	for (unsigned long index = 0; index < 80; index++) {
 		S1 = rightRotate64(E, 14) ^ rightRotate64(E, 18) ^ rightRotate64(E, 41);
@@ -100,6 +105,7 @@ void sha512EncodeBloc(t_hash64 *hash, unsigned long *W) {
 	hash->H5 += F;
 	hash->H6 += G;
 	hash->H7 += H;
+	if (isDebug) ft_printf("=========== END ENCODE ===========\n");
 }
 
 void sha512PrintHash(t_hash64 *hash) {
