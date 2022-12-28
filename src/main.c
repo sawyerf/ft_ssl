@@ -2,7 +2,9 @@
 #include "libft.h"
 
 void usage() {
-	ft_printf("Usage: ./ft_ssl [ALGO] -pqrs\n");
+	ft_printf("Usage: ./ft_ssl [ALGO] -pqrsv\n");
+	ft_printf("\nMessage Digest commands: \n");
+	ft_printf("md5 sha224 sha224 sha256 sha384 sha512\n");
 	exit(1);
 }
 
