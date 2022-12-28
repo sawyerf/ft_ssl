@@ -1,6 +1,5 @@
 #include "ft_ssl.h"
 #include "libft.h"
-#include <sys/stat.h>
 #include <fcntl.h> 
 
 void router(char **argv, char *algo, t_getFd getFd, t_getArg getArg, t_printHash printHash) {

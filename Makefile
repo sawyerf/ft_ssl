@@ -22,7 +22,7 @@ SRC_FILE =	main.c \
 			sha512Router.c \
 			router.c \
 
-CFLAGS =	-I $(INC_DIR) -I libft/inc/ -g -Wall -lm -Werror -Wextra
+CFLAGS =	-I $(INC_DIR) -I libft/inc/ -g -Wall -Werror -Wextra
 
 OBJ_DIR =	.obj
 OBJ_FILE =	$(SRC_FILE:.c=.o)

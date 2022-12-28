@@ -1,5 +1,4 @@
 #include "ft_ssl.h"
-#include <byteswap.h>
 
 unsigned int KK[] = {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -31,9 +30,9 @@ void sha256Padding(unsigned char *message, size_t full_len, t_hash *hash) {
 	message[end] = 0x80;
 	if (end >= 56) {
 		sha256EncodeBloc(hash, (unsigned int*)message);
-		bzero(message, 64);
+		ft_bzero(message, 64);
 	} else {
-		bzero(message + end + 1, 64 - end - 1);
+		ft_bzero(message + end + 1, 64 - end - 1);
 	}
 	full_len *= 8;
 	full_len = swap64(full_len);

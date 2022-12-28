@@ -34,9 +34,9 @@ void md5Padding(unsigned char *message, size_t full_len, t_hash *hash) {
 	message[end] = 0x80;
 	if (end >= 56) {
 		md5EncodeBloc(hash, (unsigned int*)message);
-		bzero(message, 64);
+		ft_bzero(message, 64);
 	} else {
-		bzero(message + end + 1, 64 - end - 1);
+		ft_bzero(message + end + 1, 64 - end - 1);
 	}
 	full_len *= 8;
 	ft_memcpy(message + 56, &full_len, 8);

@@ -1,5 +1,4 @@
 #include "ft_ssl.h"
-#include <stdio.h>
 
 int isDebug = 0;
 
@@ -23,7 +22,7 @@ void options(char **argv, char **message, t_optpars *optpars) {
 	t_opt	*opt;
 	unsigned char ret;
 
-	bzero(optpars, sizeof(t_optpars));
+	ft_bzero(optpars, sizeof(t_optpars));
 	opt_init(&opt);
 	opt_addvar2(&opt, "-s", (void*)message, OPT_STR);
 	opt_addvar(&opt, "-q", NULL, 0);

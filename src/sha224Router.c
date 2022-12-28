@@ -1,6 +1,5 @@
 #include "ft_ssl.h"
 #include "libft.h"
-#include <sys/stat.h>
 #include <fcntl.h> 
 
 void sha224GetFd(int fd, t_hash *hash, int isPrint) {
@@ -10,13 +9,13 @@ void sha224GetFd(int fd, t_hash *hash, int isPrint) {
 	unsigned char buffer[64];
 
 	sha224InitHash(hash);
-	bzero(input, 64);
+	ft_bzero(input, 64);
 	while ((len = read(fd, buffer, 64)) > 0) {
 		if (isPrint) write(1, buffer, len);
 		if ((size % 64) + len >= 64) {
 			ft_memcpy(input + (size % 64), buffer, 64 - (size % 64));
 			sha256EncodeBloc(hash, (unsigned int *)input);
-			bzero(input, 64);
+			ft_bzero(input, 64);
 			ft_memcpy(input, buffer + (64 - (size % 64)), len - (64 - (size % 64)));
 		} else {
 			ft_memcpy(input + (size % 64), buffer, len);
@@ -37,7 +36,7 @@ void sha224GetArg(char *message, t_hash *hash) {
 		message += 64;
 		index += 64;
 	}
-	bzero(current, 64);
+	ft_bzero(current, 64);
 	ft_memcpy(current, message, len - index);
 	sha256Padding(current, len, hash);
 }

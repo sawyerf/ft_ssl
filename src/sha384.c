@@ -1,5 +1,4 @@
 #include "ft_ssl.h"
-#include <byteswap.h>
 
 void sha384InitHash(t_hash64 *hash) {
 	hash->H0 = 0xcbbb9d5dc1059ed8;
