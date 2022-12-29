@@ -10,16 +10,10 @@ void usage() {
 
 int main(int argc, char **argv) {
 	if (argc > 1) {
-		if (!ft_strcmp(argv[1], "md5")) {
-			md5Router(argv + 2);
-		} else if (!ft_strcmp(argv[1], "sha224")) {
-			sha224Router(argv + 2);
-		} else if (!ft_strcmp(argv[1], "sha256")) {
-			sha256Router(argv + 2);
-		} else if (!ft_strcmp(argv[1], "sha384")) {
-			sha384Router(argv + 2);
-		} else if (!ft_strcmp(argv[1], "sha512")) {
-			sha512Router(argv + 2);
+		t_router *route = getRouter(argv[1]);
+
+		if (route) {
+			router(argv + 2, route);
 		} else {
 			usage();
 		}

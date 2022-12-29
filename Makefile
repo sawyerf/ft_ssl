@@ -11,15 +11,10 @@ SRC_DIR =	src
 SRC_FILE =	main.c \
 			utils.c \
 			md5.c \
-			md5Router.c \
 			sha224.c \
-			sha224Router.c \
 			sha384.c \
-			sha384Router.c \
 			sha256.c \
-			sha256Router.c \
 			sha512.c \
-			sha512Router.c \
 			router.c \
 
 CFLAGS =	-I $(INC_DIR) -I libft/inc/ -g -Wall -Werror -Wextra

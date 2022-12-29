@@ -13,66 +13,65 @@ typedef struct		s_hash
 	unsigned int	H5;
 	unsigned int	H6;
 	unsigned int	H7;
+
+	unsigned long	HH0;
+	unsigned long	HH1;
+	unsigned long	HH2;
+	unsigned long	HH3;
+	unsigned long	HH4;
+	unsigned long	HH5;
+	unsigned long	HH6;
+	unsigned long	HH7;
 }					t_hash;
 
-typedef struct		s_hash64
-{
-	unsigned long	H0;
-	unsigned long	H1;
-	unsigned long	H2;
-	unsigned long	H3;
-	unsigned long	H4;
-	unsigned long	H5;
-	unsigned long	H6;
-	unsigned long	H7;
-}					t_hash64;
-
-typedef void (*t_getFd)(int fd, t_hash *hash, int isPrint);
-typedef void (*t_getArg)(char *message, t_hash *hash);
+typedef void (*t_initHash)(t_hash *hash);
+typedef void (*t_encodeBloc)(t_hash *hash, void *message);
+typedef void (*t_padding)(unsigned char *message, size_t full_len, t_hash *hash);
 typedef void (*t_printHash)(t_hash *hash);
 
-typedef void (*t_getFd64)(int fd, t_hash64 *hash, int isPrint);
-typedef void (*t_getArg64)(char *message, t_hash64 *hash);
-typedef void (*t_printHash64)(t_hash64 *hash);
+typedef struct		s_router
+{
+	char			name[10];
+	char			algo[10];
+	size_t			sizeBloc;
+	t_initHash		initHash;
+	t_encodeBloc	encodeBloc;
+	t_padding		padding;
+	t_printHash		printHash;
+}					t_router;
 
 // md5
-void  md5Router(char **argv);
 void md5InitHash(t_hash *hash);
+void md5EncodeBloc(t_hash *hash, void *message);
 void md5Padding(unsigned char *message, size_t full_len, t_hash *hash);
-void md5EncodeBloc(t_hash *hash, unsigned int *message);
 void md5PrintHash(t_hash *hash);
 
 // sha224
-void  sha224Router(char **argv);
 void sha224InitHash(t_hash *hash);
 void sha224PrintHash(t_hash *hash);
 
 // sha256
-void  sha256Router(char **argv);
 void sha256InitHash(t_hash *hash);
+void sha256EncodeBloc(t_hash *hash, void *message);
 void sha256Padding(unsigned char *message, size_t full_len, t_hash *hash);
-void sha256EncodeBloc(t_hash *hash, unsigned int *message);
 void sha256PrintHash(t_hash *hash);
-void sha256GetFd(int fd, t_hash *hash, int isPrint);
-void sha256GetArg(char *message, t_hash *hash);
 
 // sha384
-void  sha384Router(char **argv);
-void sha384InitHash(t_hash64 *hash);
-void sha384PrintHash(t_hash64 *hash);
+void sha384InitHash(t_hash *hash);
+void sha384PrintHash(t_hash *hash);
 
 // sha512
-void  sha512Router(char **argv);
-void sha512InitHash(t_hash64 *hash);
-void sha512Padding(unsigned char *message, size_t full_len, t_hash64 *hash);
-void sha512EncodeBloc(t_hash64 *hash, unsigned long *message);
-void sha512PrintHash(t_hash64 *hash);
-void sha512GetFd(int fd, t_hash64 *hash, int isPrint);
-void sha512GetArg(char *message, t_hash64 *hash);
+void sha512InitHash(t_hash *hash);
+void sha512Padding(unsigned char *message, size_t full_len, t_hash *hash);
+void sha512EncodeBloc(t_hash *hash, void *message);
+void sha512PrintHash(t_hash *hash);
+
+// Base64
+void base64Encode(unsigned char *message, size_t size);
 
 // router
-void router(char **argv, char *algo, t_getFd getFd, t_getArg getArg, t_printHash printHash);
-void router64(char **argv, char *algo, t_getFd64 getFd, t_getArg64 getArg, t_printHash64 printHash);
+t_router	*getRouter(char *name);
+void router(char **argv, t_router *router);
 
 // Print
 void print_bits(unsigned char *str, size_t len);

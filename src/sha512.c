@@ -19,20 +19,20 @@ unsigned long KKK[] = {
 	0x431d67c49c100d4c, 0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817
 };
 
-void sha512InitHash(t_hash64 *hash) {
-	hash->H0 = 0x6a09e667f3bcc908;
-	hash->H1 = 0xbb67ae8584caa73b;
-	hash->H2 = 0x3c6ef372fe94f82b;
-	hash->H3 = 0xa54ff53a5f1d36f1;
-	hash->H4 = 0x510e527fade682d1;
-	hash->H5 = 0x9b05688c2b3e6c1f;
-	hash->H6 = 0x1f83d9abfb41bd6b;
-	hash->H7 = 0x5be0cd19137e2179;
+void sha512InitHash(t_hash *hash) {
+	hash->HH0 = 0x6a09e667f3bcc908;
+	hash->HH1 = 0xbb67ae8584caa73b;
+	hash->HH2 = 0x3c6ef372fe94f82b;
+	hash->HH3 = 0xa54ff53a5f1d36f1;
+	hash->HH4 = 0x510e527fade682d1;
+	hash->HH5 = 0x9b05688c2b3e6c1f;
+	hash->HH6 = 0x1f83d9abfb41bd6b;
+	hash->HH7 = 0x5be0cd19137e2179;
 }
 
 extern int isDebug;
 
-void sha512Padding(unsigned char *message, size_t full_len, t_hash64 *hash) {
+void sha512Padding(unsigned char *message, size_t full_len, t_hash *hash) {
 	size_t end = full_len % 128;
 
 	message[end] = 0x80;
@@ -54,16 +54,17 @@ void sha512Padding(unsigned char *message, size_t full_len, t_hash64 *hash) {
 // << (left shift)
 // >> (right shift)
 // ~  (bitwise NOT)
-void sha512EncodeBloc(t_hash64 *hash, unsigned long *W) {
-	unsigned long A = hash->H0;
-	unsigned long B = hash->H1;
-	unsigned long C = hash->H2;
-	unsigned long D = hash->H3;
-	unsigned long E = hash->H4;
-	unsigned long F = hash->H5;
-	unsigned long G = hash->H6;
-	unsigned long H = hash->H7;
+void sha512EncodeBloc(t_hash *hash, void *data) {
+	unsigned long A = hash->HH0;
+	unsigned long B = hash->HH1;
+	unsigned long C = hash->HH2;
+	unsigned long D = hash->HH3;
+	unsigned long E = hash->HH4;
+	unsigned long F = hash->HH5;
+	unsigned long G = hash->HH6;
+	unsigned long H = hash->HH7;
 	unsigned long S0, S1, temp1, temp2, CH, maj;
+	unsigned long *W = (unsigned long *)data;
 	unsigned long message[80];
 
 	if (isDebug) ft_printf("\n=========== SHA ENCODE ===========\n");
@@ -96,26 +97,26 @@ void sha512EncodeBloc(t_hash64 *hash, unsigned long *W) {
 		B = A;
 		A = temp1 + temp2;
 	}
-	hash->H0 += A;
-	hash->H1 += B;
-	hash->H2 += C;
-	hash->H3 += D;
-	hash->H4 += E;
-	hash->H5 += F;
-	hash->H6 += G;
-	hash->H7 += H;
+	hash->HH0 += A;
+	hash->HH1 += B;
+	hash->HH2 += C;
+	hash->HH3 += D;
+	hash->HH4 += E;
+	hash->HH5 += F;
+	hash->HH6 += G;
+	hash->HH7 += H;
 	if (isDebug) ft_printf("=========== END ENCODE ===========\n");
 }
 
-void sha512PrintHash(t_hash64 *hash) {
+void sha512PrintHash(t_hash *hash) {
 	ft_printf("%016lx%016lx%016lx%016lx%016lx%016lx%016lx%016lx",
-		hash->H0,
-		hash->H1,
-		hash->H2,
-		hash->H3,
-		hash->H4,
-		hash->H5,
-		hash->H6,
-		hash->H7
+		hash->HH0,
+		hash->HH1,
+		hash->HH2,
+		hash->HH3,
+		hash->HH4,
+		hash->HH5,
+		hash->HH6,
+		hash->HH7
 	);
 }

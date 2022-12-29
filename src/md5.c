@@ -49,7 +49,7 @@ void md5Padding(unsigned char *message, size_t full_len, t_hash *hash) {
 // << (left shift)
 // >> (right shift)
 // ~  (bitwise NOT)
-void md5EncodeBloc(t_hash *hash, unsigned int *message) {
+void md5EncodeBloc(t_hash *hash, void *data) {
 	unsigned int A = hash->H1;
 	unsigned int B = hash->H2;
 	unsigned int C = hash->H3;
@@ -57,6 +57,7 @@ void md5EncodeBloc(t_hash *hash, unsigned int *message) {
 	unsigned int F = 0;
 	unsigned int G = 0;
 	unsigned int temp = 0;
+	unsigned int *message = (unsigned int *)data;
 
 	if (isDebug) ft_printf("\n=========== MD5 ENCODE ===========\n");
 	if (isDebug) md5PrintHash(hash);

@@ -46,7 +46,7 @@ void sha256Padding(unsigned char *message, size_t full_len, t_hash *hash) {
 // << (left shift)
 // >> (right shift)
 // ~  (bitwise NOT)
-void sha256EncodeBloc(t_hash *hash, unsigned int *W) {
+void sha256EncodeBloc(t_hash *hash, void *data) {
 	unsigned int A = hash->H0;
 	unsigned int B = hash->H1;
 	unsigned int C = hash->H2;
@@ -56,6 +56,7 @@ void sha256EncodeBloc(t_hash *hash, unsigned int *W) {
 	unsigned int G = hash->H6;
 	unsigned int H = hash->H7;
 	unsigned int S0, S1, temp1, temp2, CH, maj;
+	unsigned int *W = (unsigned int *)data;
 	unsigned int message[64];
 
 	if (isDebug) ft_printf("\n=========== SHA ENCODE ===========\n");
