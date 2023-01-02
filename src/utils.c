@@ -66,3 +66,22 @@ unsigned long rightRotate64(unsigned long n, unsigned long d) {
 unsigned int rightShift(unsigned int n, unsigned int d) {
 	return (n >> d);
 }
+
+ssize_t turboRead(int fd, char *data, size_t sizeBloc) {
+	unsigned char buffer[128];
+	ssize_t len;
+	size_t size = 0;
+
+	ft_bzero(data, sizeBloc);
+	while ((len = read(fd, buffer, sizeBloc - size)) > 0) {
+		ft_memcpy(data + size, buffer, len);
+		size += len;
+		if (size == sizeBloc) {
+			return (size);
+		}
+	}
+	if (len < 0) {
+		return -1;
+	}
+	return size;
+}

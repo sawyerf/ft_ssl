@@ -1,5 +1,6 @@
 #include "ft_ssl.h"
 #include "libft.h"
+#include <fcntl.h>
 
 char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -23,7 +24,6 @@ void optionsBase64(char **argv, char **input, char **output, t_optpars *optpars)
 	isDebug = ft_tabfind(optpars->opt, "-v") > 0;
 }
 
-void	base64Router(char **argv)
 char	getBase64(char index) {
 	return base64[index];
 }
@@ -50,7 +50,7 @@ unsigned int	turboShift(unsigned int n) {
 	return n;
 }
 
-void	base64EncodeBloc(unsigned char *message, int size) {
+void	base64EncodeBloc(unsigned char *message, int size, int fd) {
 	unsigned int tmp;
 	unsigned char *current;
 	unsigned char lol;
@@ -61,25 +61,25 @@ void	base64EncodeBloc(unsigned char *message, int size) {
 	for (int i = 0; i < size + 1; i++) {
 		lol = *current & 0xFC;
 		lol = lol >> 2;
-		ft_printf("%c", getBase64(lol));
+		ft_dprintf(fd, "%c", getBase64(lol));
 		tmp = turboShift(tmp);
 	}
 }
 
-void	base64Encode(unsigned char *message, size_t size) {
+void	base64Encode(unsigned char *message, size_t size, int fd) {
 	unsigned int index = 0;
 	isDebug = 1;
 
 	for (; index < (unsigned int)size - size % 3; index += 3) {
-		base64EncodeBloc(message + index, 3);
+		base64EncodeBloc(message + index, 3, fd);
 	}
 	if (size % 3) {
-		base64EncodeBloc(message + index, size % 3);
+		base64EncodeBloc(message + index, size % 3, fd);
 		for (int i = 0; i < (3 - size % 3); i++) {
-			ft_printf("=");
+			ft_dprintf(fd, "=");
 		}
 	}
-	ft_printf("\n");
+	ft_dprintf(fd, "\n");
 }
 
 void	compressBase64(char *str) {
@@ -95,7 +95,7 @@ void	compressBase64(char *str) {
 	str[3] = 0;
 }
 
-void	base64Decode(unsigned char *message, size_t size) {
+void	base64Decode(unsigned char *message, size_t size, int fd) {
 	unsigned int index = 0;
 	unsigned char tmp[4];
 	isDebug = 1;
@@ -105,10 +105,40 @@ void	base64Decode(unsigned char *message, size_t size) {
 		for (int i = 0; i < 4; i++) {
 			tmp[i] = getIndex(message[index + i]);
 		}
-		// print_bits(tmp, 4);
 		compressBase64(tmp);
-		// print_bits(tmp, 4);
-		write(1, tmp, 3);
+		write(fd, tmp, 3);
 	}
-	ft_printf("\n");
+	ft_dprintf(fd, "\n");
+}
+
+void	base64Router(char **argv) {
+	char *input, *output;
+	t_optpars	opt;
+	char	data[66];
+	ssize_t len;
+	int fdi = 0, fdo = 1;
+
+	optionsBase64(argv, &input, &output, &opt);
+	if (input) {
+		if ((fdi = open(input, O_RDONLY)) < 0) {
+			ft_dprintf(2, "ERROR: Can't open file `%s'\n", input);
+			exit(1);
+		}
+	}
+	if (output) {
+		if ((fdo = open(output, O_WRONLY | O_CREAT)) < 0) {
+			ft_dprintf(2, "ERROR: Can't open file `%s'\n", output);
+			exit(1);
+		}
+	}
+	while ((len = turboRead(fdi, data, 66)) > 0) {
+		if (ft_tabfind(opt.opt, "-d")) {
+			base64Decode(data, len, fdo);
+		} else {
+			base64Encode(data, len, fdo);
+		}
+		if (len != 66) return ;
+	}
+	close(fdi);
+	close(fdo);
 }

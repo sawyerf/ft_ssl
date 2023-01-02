@@ -67,8 +67,7 @@ void sha512EncodeBloc(t_hash *hash, void *message);
 void sha512PrintHash(t_hash *hash);
 
 // Base64
-void	base64Encode(unsigned char *message, size_t size);
-void	base64Decode(unsigned char *message, size_t size);
+void	base64Router(char **argv);
 
 // router
 t_router	*getRouter(char *name);
@@ -84,5 +83,6 @@ unsigned int leftRotate(unsigned int n, unsigned int d);
 unsigned int rightRotate(unsigned int n, unsigned int d);
 unsigned int rightShift(unsigned int n, unsigned int d);
 unsigned long rightRotate64(unsigned long n, unsigned long d);
+ssize_t turboRead(int fd, char *data, size_t sizeBloc);
 
 #endif
