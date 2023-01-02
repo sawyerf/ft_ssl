@@ -15,9 +15,10 @@ SRC_FILE =	main.c \
 			sha384.c \
 			sha256.c \
 			sha512.c \
+			base64.c \
 			router.c \
 
-CFLAGS =	-I $(INC_DIR) -I libft/inc/ -g -Wall -Werror -Wextra
+CFLAGS =	-I $(INC_DIR) -I libft/inc/ -g # -Wall -Werror -Wextra
 
 OBJ_DIR =	.obj
 OBJ_FILE =	$(SRC_FILE:.c=.o)

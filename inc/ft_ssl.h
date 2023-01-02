@@ -67,7 +67,8 @@ void sha512EncodeBloc(t_hash *hash, void *message);
 void sha512PrintHash(t_hash *hash);
 
 // Base64
-void base64Encode(unsigned char *message, size_t size);
+void	base64Encode(unsigned char *message, size_t size);
+void	base64Decode(unsigned char *message, size_t size);
 
 // router
 t_router	*getRouter(char *name);

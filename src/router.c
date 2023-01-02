@@ -101,7 +101,7 @@ void router(char **argv, t_router *route) {
 }
 
 t_router	*getRouter(char *name) {
-	for (int index; index < 5; index++) {
+	for (int index = 0; index < 5; index++) {
 		if (!ft_strcmp(routes[index].name, name))
 		return &routes[index];
 	}

@@ -12,7 +12,9 @@ int main(int argc, char **argv) {
 	if (argc > 1) {
 		t_router *route = getRouter(argv[1]);
 
-		if (route) {
+		if (!ft_strcmp(argv[1], "base64")) {
+			base64Decode((unsigned char *)argv[2], ft_strlen(argv[2]));
+		} else if (route) {
 			router(argv + 2, route);
 		} else {
 			usage();
