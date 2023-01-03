@@ -73,8 +73,7 @@ ssize_t turboRead(int fd, char *data, size_t sizeBloc) {
 	size_t size = 0;
 
 	ft_bzero(data, sizeBloc);
-	while ((len = read(fd, buffer, sizeBloc - size)) > 0) {
-		ft_memcpy(data + size, buffer, len);
+	while ((len = read(fd, data + size, sizeBloc - size)) > 0) {
 		size += len;
 		if (size == sizeBloc) {
 			return (size);

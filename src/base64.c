@@ -6,6 +6,8 @@ char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+
 
 extern int isDebug;
 
+// TODO: Check == decode
+
 void optionsBase64(char **argv, char **input, char **output, t_optpars *optpars) {
 	t_opt	*opt;
 	unsigned char ret;
@@ -112,9 +114,9 @@ void	base64Decode(unsigned char *message, size_t size, int fd) {
 }
 
 void	base64Router(char **argv) {
-	char *input, *output;
+	char *input = NULL, *output = NULL;
 	t_optpars	opt;
-	char	data[66];
+	char	data[120];
 	ssize_t len;
 	int fdi = 0, fdo = 1;
 
@@ -126,18 +128,18 @@ void	base64Router(char **argv) {
 		}
 	}
 	if (output) {
-		if ((fdo = open(output, O_WRONLY | O_CREAT)) < 0) {
+		if ((fdo = open(output, O_WRONLY | O_CREAT)) < 0) { // Fichier existe deja
 			ft_dprintf(2, "ERROR: Can't open file `%s'\n", output);
 			exit(1);
 		}
 	}
-	while ((len = turboRead(fdi, data, 66)) > 0) {
+	while ((len = turboRead(fdi, data, 120)) > 0) {
 		if (ft_tabfind(opt.opt, "-d")) {
 			base64Decode(data, len, fdo);
 		} else {
 			base64Encode(data, len, fdo);
 		}
-		if (len != 66) return ;
+		if (len != 120) return ;
 	}
 	close(fdi);
 	close(fdo);
