@@ -1,4 +1,4 @@
-unsigned int s_box[8][4][16] = {
+unsigned char s_box[8][4][16] = {
 	{
 		{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
 		{0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
@@ -56,43 +56,49 @@ unsigned int s_box[8][4][16] = {
 	}
 };
 
-void permutation(char *data, unsigned int permu, int size) {
-	unsigned long tmp = 0;
+unsigned int substitution(unsigned long right, unsigned long key) {
+	int col = 0;
+	int line = 0;
+	unsigned char *S = (unsigned char*)&right;
+	unsigned int ret;
 
-	memcpy(tmp, data, size);
-
-	for (int index = 0; index < size; index++) {
-		unsigned long d = 0;
-
-		d = tmp | (0b1 << permu[index])
-		if (permu[index] > index) {
-			data |= tmp << (index - permu[index]);
-		} else {
-			data |= tmp << (index - permu[index]);
-		}
+	for (int index = 0; index < 8; index++) {
+		line = ((*s >> 5) & 0b10000000) | (*s & 0b1);
+		col = (*s & 0b01111000) >> 3;
+		ret = s_box[index][line][col] << (32 - (4 * (index + 1)));
+		turboNShift(s, 8);
 	}
+	return ret;
 }
 
 // bloc 64bits
 // key 48bits
 // right, left 32bits
-void desEncrypt(unsigned int *bloc, unsigned long key) {
-	unsigned int *left, *right;
-	unsigned int *left1, *right1;
+unsigned long desBlocEncrypt(unsigned int *bloc, unsigned long key) {
+	unsigned long left, right;
+	unsigned long ret;
 
-	left = bloc;
-	right = bloc + 1;
+	ft_memcpy(&left, bloc, 4);
+	ft_memcpy(&right, bloc + 1, 4);
 
-	left1 = right;
-	permutation(right, 32)
+	ft_memcpy(&ret, &right, 4);
+	// E
+	permutation(right, E_permu, 48)
 	right = right ^ key;
-	// substitution right
-	// p Right
+	// Substitution
+	right = (unsigned long)substitution(right, key);
+	// P
+	permutation(right, P_permu, 32)
 	right1 = right ^ left;
+	// FINAL
+	permutation(right, FINAL_permu, 64);
+	ft_memcpy(((unsigned char *)&ret) + 4, &right, 4);
+	return ret;
 }
 
+void desEncrypt(unsigned char *message, unsigned long key)
 {
 	for (int index = 0; index < 16; index++) {
-		desEncrypt
+		desEncrypt(message )
 	}
 }

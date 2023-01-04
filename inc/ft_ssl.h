@@ -84,5 +84,6 @@ unsigned int rightRotate(unsigned int n, unsigned int d);
 unsigned int rightShift(unsigned int n, unsigned int d);
 unsigned long rightRotate64(unsigned long n, unsigned long d);
 ssize_t turboRead(int fd, char *data, size_t sizeBloc);
+void	turboNShift(void *n, int size);
 
 #endif

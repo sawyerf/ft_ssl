@@ -84,3 +84,13 @@ ssize_t turboRead(int fd, char *data, size_t sizeBloc) {
 	}
 	return size;
 }
+
+void	turboNShift(void *n, int size) {
+	unsigned char *tmp = (unsigned char*)n;
+
+	for (int index = 0; i < size - 1; i++) {
+		tmp[index] <<= 6;
+		tmp[index] |= (tmp[index + 1] >> 2) & 0x3F;
+	}
+	tmp[index + 1] <<= 6;
+}
