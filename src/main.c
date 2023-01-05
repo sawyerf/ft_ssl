@@ -14,6 +14,8 @@ int main(int argc, char **argv) {
 
 		if (!ft_strcmp(argv[1], "base64")) {
 			base64Router(argv + 2);
+		} else if (!ft_strcmp(argv[1], "base64")) {
+			desECB_Router(argv + 2);
 		} else if (route) {
 			router(argv + 2, route);
 		} else {

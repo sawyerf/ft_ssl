@@ -1,4 +1,7 @@
-unsigned char s_box[8][4][16] = {
+#include "ft_ssl.h"
+#include "libft.h"
+
+unsigned int  s_box[8][4][16] = {
 	{
 		{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
 		{0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
@@ -56,6 +59,98 @@ unsigned char s_box[8][4][16] = {
 	}
 };
 
+unsigned int INIT_permu[] = {
+	58, 50, 42, 34, 26, 18, 10, 2,
+	60, 52, 44, 36, 28, 20, 12, 4,
+	62, 54, 46, 38, 30, 22, 14, 6,
+	64, 56, 48, 40, 32, 24, 16, 8,
+	57, 49, 41, 33, 25, 17, 9, 1,
+	59, 51, 43, 35, 27, 19, 11, 3,
+	61, 53, 45, 37, 29, 21, 13, 5,
+	63, 55, 47, 39, 31, 23, 15, 7
+};
+
+unsigned int E_permu[] = {
+	32, 1, 2, 3, 4, 5, 4, 5,
+	6, 7, 8, 9, 8, 9, 10, 11,
+	12, 13, 12, 13, 14, 15, 16, 17,
+	16, 17, 18, 19, 20, 21, 20, 21,
+	22, 23, 24, 25, 24, 25, 26, 27,
+	28, 29, 28, 29, 30, 31, 32, 1
+};
+
+unsigned int P_permu[] = {
+	16, 7, 20, 21,
+	29, 12, 28, 17,
+	1, 15, 23, 26,
+	5, 18, 31, 10,
+	2, 8, 24, 14,
+	32, 27, 3, 9,
+	19, 13, 30, 6,
+	22, 11, 4, 25
+};
+
+unsigned int FINAL_permu[] = {
+	40, 8, 48, 16, 56, 24, 64, 32,
+	39, 7, 47, 15, 55, 23, 63, 31,
+	38, 6, 46, 14, 54, 22, 62, 30,
+	37, 5, 45, 13, 53, 21, 61, 29,
+	36, 4, 44, 12, 52, 20, 60, 28,
+	35, 3, 43, 11, 51, 19, 59, 27,
+	34, 2, 42, 10, 50, 18, 58, 26,
+	33, 1, 41, 9, 49, 17, 57, 25
+};
+
+unsigned int C_permu[] = {
+	57, 49, 41, 33, 25, 17, 9,
+	1, 58, 50, 42, 34, 26, 18,
+	10, 2, 59, 51, 43, 35, 27,
+	19, 11, 3, 60, 52, 44, 36,
+	63, 55, 47, 39, 31, 23, 15,
+	7, 62, 54, 46, 38, 30, 22,
+	14, 6, 61, 53, 45, 37, 29,
+	21, 13, 5, 28, 20, 12, 4
+};
+
+unsigned int KEY_shift[] = {
+	1, 1, 2, 2,
+	2, 2, 2, 2,
+	1, 2, 2, 2,
+	2, 2, 2, 1
+};
+
+unsigned int KEY_permu[] = {
+	14, 17, 11, 24, 1, 5,
+	3, 28, 15, 6, 21, 10,
+	23, 19, 12, 4, 26, 8,
+	16, 7, 27, 20, 13, 2,
+	41, 52, 31, 37, 47, 55,
+	30, 40, 51, 45, 33, 48,
+	44, 49, 39, 56, 34, 53,
+	46, 42, 50, 36, 29, 32
+};
+
+unsigned int shiftLeft28(unsigned int n, int d) {
+	return (n << d) | (n >> (28 - d));
+}
+
+void permutation(void *data, unsigned int *permu, int size) {
+	unsigned long tmp = 0;
+	unsigned long *n = data;
+
+	ft_memcpy(&tmp, data, size / 8);
+	*n = 0;
+	for (int index = 0; index < size; index++) {
+		unsigned d = tmp | (0b1 << (64 - permu[index]));
+
+		if (permu[index] > index) {
+			*n |= d << (permu[index] - index);
+		} else {
+			*n |= d >> (index - permu[index]);
+		}
+	}
+}
+
 unsigned int substitution(unsigned long right, unsigned long key) {
 	int col = 0;
 	int line = 0;
@@ -63,42 +158,55 @@ unsigned int substitution(unsigned long right, unsigned long key) {
 	unsigned int ret;
 
 	for (int index = 0; index < 8; index++) {
-		line = ((*s >> 5) & 0b10000000) | (*s & 0b1);
-		col = (*s & 0b01111000) >> 3;
+		line = ((*S >> 5) & 0b10000000) | (*S & 0b1); // la vie je crois y a une erreur // >> 5 ?
+		col = (*S & 0b01111000) >> 3;
 		ret = s_box[index][line][col] << (32 - (4 * (index + 1)));
-		turboNShift(s, 8);
+		turboNShift(S, 8);
 	}
 	return ret;
+}
+
+void	generateKey(unsigned long *key, unsigned long *keys) {
+	unsigned int left, right;
+	unsigned int concat[2];
+
+	permutation(key, C_permu, 56);
+	left = *key >> 28;
+	right = *key & 0xFFFFFFF;
+	for (int index = 0; index < 16; index++) {
+		right = shiftLeft28(right, KEY_shift[index]);
+		left = shiftLeft28(left,  KEY_shift[index]);
+		concat[0] = left;
+		concat[1] = right;
+		permutation((void*)concat, KEY_permu, 48);
+		ft_memcpy(keys + index, concat, 8);
+	}
 }
 
 // bloc 64bits
 // key 48bits
 // right, left 32bits
-unsigned long desBlocEncrypt(unsigned int *bloc, unsigned long key) {
-	unsigned long left, right;
+unsigned long desEncrypt(unsigned int *bloc, unsigned long *keys) {
+	unsigned long left, right, tmp;
 	unsigned long ret;
 
+	permutation(&bloc, INIT_permu, 64);
 	ft_memcpy(&left, bloc, 4);
 	ft_memcpy(&right, bloc + 1, 4);
-
-	ft_memcpy(&ret, &right, 4);
-	// E
-	permutation(right, E_permu, 48)
-	right = right ^ key;
-	// Substitution
-	right = (unsigned long)substitution(right, key);
-	// P
-	permutation(right, P_permu, 32)
-	right1 = right ^ left;
-	// FINAL
-	permutation(right, FINAL_permu, 64);
-	ft_memcpy(((unsigned char *)&ret) + 4, &right, 4);
-	return ret;
-}
-
-void desEncrypt(unsigned char *message, unsigned long key)
-{
 	for (int index = 0; index < 16; index++) {
-		desEncrypt(message )
+		tmp = right;
+		// E
+		permutation(&right, E_permu, 48);
+		right = right ^ keys[index];
+		// Substitution
+		right = (unsigned long)substitution(right, keys[index]);
+		// P
+		permutation(&right, P_permu, 32);
+		right = right ^ left;
+		left = tmp;
 	}
+	ft_memcpy(((unsigned char *)&ret) + 4, &right, 4);
+	// FINAL
+	permutation(&ret, FINAL_permu, 64);
+	return ret;
 }

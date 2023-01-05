@@ -69,6 +69,13 @@ void sha512PrintHash(t_hash *hash);
 // Base64
 void	base64Router(char **argv);
 
+// DES
+void	generateKey(unsigned long *key, unsigned long *keys);
+unsigned long desEncrypt(unsigned int *bloc, unsigned long *keys);
+
+// DES-ECB
+void desECB_Router(char **argv);
+
 // router
 t_router	*getRouter(char *name);
 void router(char **argv, t_router *router);
