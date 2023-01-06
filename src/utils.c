@@ -111,7 +111,7 @@ unsigned long	atoi_hex(char *str)
 	ret = 0;
 	for (int i = 0; str[i]; i++)
 	{
-		if (str[i] >= '1' && str[i] <= '9')
+		if (str[i] >= '0' && str[i] <= '9')
 			ret = ret * 16 + str[i] - '0';
 		else if (str[i] >= 'a' && str[i] <= 'f')
 			ret = ret * 16 + str[i] - 'a' + 10;
