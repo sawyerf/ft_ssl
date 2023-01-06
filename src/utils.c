@@ -1,6 +1,6 @@
 #include "ft_ssl.h"
 
-int isDebug = 0;
+int isDebug = 1;
 
 void print_bit(unsigned char n) {
 	for (int i = 7; i >= 0; i--) {
@@ -9,15 +9,23 @@ void print_bit(unsigned char n) {
 	ft_printf(" ");
 }
 
-void print_bits(unsigned char *str, size_t len) {
+void print_bits(void *str, size_t len) {
 	if (!isDebug) return ;
 	for (size_t i = 0; i < len; i++) {
 		if (!(i % 8)) ft_printf("\n");
-		print_bit(str[i]);
+		print_bit(((unsigned char *)str)[i]);
 	}
 	ft_printf("\n");
 }
 
+void print_dbits(char *name, void *str, size_t len) {
+	ft_printf("%s: \n", name);
+	for (size_t i = 0; i < len; i++) {
+		if (!(i % 8) && i) ft_printf("\n");
+		print_bit(((unsigned char *)str)[i]);
+	}
+	ft_printf("\n");
+}
 void options(char **argv, char **message, t_optpars *optpars) {
 	t_opt	*opt;
 	unsigned char ret;
@@ -94,4 +102,23 @@ void	turboNShift(void *n, int size) {
 		tmp[index] |= (tmp[index + 1] >> 2) & 0x3F;
 	}
 	tmp[index + 1] = tmp[index + 1] << 6;
+}
+
+unsigned long	atoi_hex(char *str)
+{
+	unsigned long	ret;
+
+	ret = 0;
+	for (int i = 0; str[i]; i++)
+	{
+		if (str[i] >= '1' && str[i] <= '9')
+			ret = ret * 16 + str[i] - '0';
+		else if (str[i] >= 'a' && str[i] <= 'f')
+			ret = ret * 16 + str[i] - 'a' + 10;
+		else if (str[i] >= 'A' && str[i] <= 'F')
+			ret = ret * 16 + str[i] - 'A' + 10;
+		else
+			return (-1);
+	}
+	return (ret);
 }

@@ -70,8 +70,8 @@ void sha512PrintHash(t_hash *hash);
 void	base64Router(char **argv);
 
 // DES
-void	generateKey(unsigned long *key, unsigned long *keys);
-unsigned long desEncrypt(unsigned int *bloc, unsigned long *keys);
+void	generateKey(unsigned long key, unsigned long *keys);
+unsigned long desEncrypt(unsigned long bloc, unsigned long *keys);
 
 // DES-ECB
 void desECB_Router(char **argv);
@@ -81,7 +81,9 @@ t_router	*getRouter(char *name);
 void router(char **argv, t_router *router);
 
 // Print
-void print_bits(unsigned char *str, size_t len);
+void print_bits(void *str, size_t len);
+void print_dbits(char *name, void *str, size_t len);
+
 
 void options(char **argv, char **message, t_optpars *ret);
 unsigned int swap32(unsigned int num);
@@ -92,5 +94,6 @@ unsigned int rightShift(unsigned int n, unsigned int d);
 unsigned long rightRotate64(unsigned long n, unsigned long d);
 ssize_t turboRead(int fd, char *data, size_t sizeBloc);
 void	turboNShift(void *n, int size);
+unsigned long	atoi_hex(char *str);
 
 #endif
