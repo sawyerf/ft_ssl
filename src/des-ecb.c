@@ -18,8 +18,8 @@ void optionsDesECB(char **argv, char **key, t_optpars *optpars) {
 void desECB_Router(char **argv) {
 	t_optpars opt;
 	char	*keyStr = NULL;
-	unsigned long key;
-	unsigned long keys[16];
+	unsigned long key, keys[16], data[3], cipherText[3];
+	int len = 0;
 
 	optionsDesECB(argv, &keyStr, &opt);
 	if (!keyStr || ft_strlen(keyStr) != 16) {
@@ -27,10 +27,19 @@ void desECB_Router(char **argv) {
 		exit(1);
 	}
 	key = atoi_hex(keyStr);
+
 	generateKey(key, keys);
-	int len = ft_strlen(opt.arg[0]);
-	for (int index = 0; index < len; index += 8) {
-		unsigned long lol = desEncrypt(((unsigned long *)(opt.arg[0] + index))[0], keys);
-		// ft_printf("%d\n", lol);
+	while ((len = turboRead(0, data, 8 * 3)) > 0) {
+		int index;
+
+		if (len != 8*3) {
+			desPadding(data, len);
+			len = len + (8 - len % 8);
+		}
+		for (index = 0; index < len / 8; index++) {
+			cipherText[index] = desEncrypt(data[index], keys);
+		}
+		base64Encode((char *)cipherText, len, 1);
+		if (len != 8*3) break;
 	}
 }

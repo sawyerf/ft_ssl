@@ -165,6 +165,14 @@ unsigned long substitution(unsigned long right) {
 	return ret;
 }
 
+void	desPadding(void *d, size_t size) {
+	char *data = (char*)d;
+
+	for (int i = 0; i < 8 - (size % 8); i++) {
+		data[size + i] = 64; //(size % 8) * 8;
+	}
+}
+
 void	generateKey(unsigned long key, unsigned long *keys) {
 	unsigned long left, right;
 	unsigned long concat = 0;
@@ -186,8 +194,8 @@ void	generateKey(unsigned long key, unsigned long *keys) {
 // right, left 32bits
 unsigned long desEncrypt(unsigned long bloc, unsigned long *keys) {
 	unsigned long left, right, tmp;
-	unsigned long ret;
 
+	bloc = swap64(bloc);
 	bloc = permutation(bloc, INIT_permu, 64, 64);
 	left = bloc >> 32;
 	right = bloc & 0xffffffff;
@@ -203,8 +211,8 @@ unsigned long desEncrypt(unsigned long bloc, unsigned long *keys) {
 		right = right ^ left;
 		left = tmp;
 	}
-	ret = (right << 32) | left;
+	bloc = (right << 32) | left;
 	// FINAL
-	ret = permutation(ret, FINAL_permu, 64, 64);
-	return ret;
+	bloc = permutation(bloc, FINAL_permu, 64, 64);
+	return swap64(bloc);
 }

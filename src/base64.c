@@ -81,7 +81,6 @@ void	base64Encode(unsigned char *message, size_t size, int fd) {
 			ft_dprintf(fd, "=");
 		}
 	}
-	ft_dprintf(fd, "\n");
 }
 
 void	compressBase64(char *str) {
@@ -110,7 +109,6 @@ void	base64Decode(unsigned char *message, size_t size, int fd) {
 		compressBase64(tmp);
 		write(fd, tmp, 3);
 	}
-	ft_dprintf(fd, "\n");
 }
 
 void	base64Router(char **argv) {
@@ -141,6 +139,7 @@ void	base64Router(char **argv) {
 		}
 		if (len != 120) return ;
 	}
+	ft_dprintf(fdo, "\n");
 	close(fdi);
 	close(fdo);
 }

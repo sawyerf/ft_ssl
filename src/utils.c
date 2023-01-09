@@ -75,7 +75,7 @@ unsigned int rightShift(unsigned int n, unsigned int d) {
 	return (n >> d);
 }
 
-ssize_t turboRead(int fd, char *data, size_t sizeBloc) {
+ssize_t turboRead(int fd, void *data, size_t sizeBloc) {
 	unsigned char buffer[128];
 	ssize_t len;
 	size_t size = 0;

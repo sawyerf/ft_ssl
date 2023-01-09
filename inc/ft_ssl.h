@@ -68,10 +68,13 @@ void sha512PrintHash(t_hash *hash);
 
 // Base64
 void	base64Router(char **argv);
+void	base64Encode(unsigned char *message, size_t size, int fd);
+void	base64Decode(unsigned char *message, size_t size, int fd);
 
 // DES
 void	generateKey(unsigned long key, unsigned long *keys);
 unsigned long desEncrypt(unsigned long bloc, unsigned long *keys);
+void	desPadding(void *d, size_t size);
 
 // DES-ECB
 void desECB_Router(char **argv);
@@ -92,7 +95,7 @@ unsigned int leftRotate(unsigned int n, unsigned int d);
 unsigned int rightRotate(unsigned int n, unsigned int d);
 unsigned int rightShift(unsigned int n, unsigned int d);
 unsigned long rightRotate64(unsigned long n, unsigned long d);
-ssize_t turboRead(int fd, char *data, size_t sizeBloc);
+ssize_t turboRead(int fd, void *data, size_t sizeBloc);
 void	turboNShift(void *n, int size);
 unsigned long	atoi_hex(char *str);
 
