@@ -130,6 +130,14 @@ unsigned int KEY_permu[] = {
 	46, 42, 50, 36, 29, 32
 };
 
+void	print_long(unsigned long n) {
+	for (int index = 0; index < 64; index++) {
+		if (!(index % 8) && index) ft_printf(" ");
+		ft_printf("%d", (n >> (63 - index)) & 1);
+	}
+	ft_printf("\n");
+}
+
 unsigned int shiftLeft28(unsigned int n, int d) {
 	return ((n << d) | (n >> (28 - d))) & 0x0FFFFFFFUL;
 }
@@ -143,27 +151,18 @@ unsigned long permutation(unsigned long nb, unsigned int *permu, int fromSize, i
 	return tmp;
 }
 
-unsigned int substitution(unsigned long right, unsigned long key) {
+unsigned long substitution(unsigned long right) {
 	int col = 0;
 	int line = 0;
-	unsigned char *S = (unsigned char*)&right;
-	unsigned int ret;
+	unsigned long ret = 0;
 
 	for (int index = 0; index < 8; index++) {
-		line = ((*S >> 5) & 0b10000000) | (*S & 0b1); // la vie je crois y a une erreur // >> 5 ?
-		col = (*S & 0b01111000) >> 3;
-		ret = s_box[index][line][col] << (32 - (4 * (index + 1)));
-		turboNShift(S, 8);
+		line = ((right >> 4) & 0b10UL) | (right & 1);
+		col = (right >> 1) & 0b1111UL;
+		ret |= s_box[7 - index][line][col] << (index * 4);
+		right = right >> 6;
 	}
 	return ret;
-}
-
-void	print_long(unsigned long n) {
-	for (int index = 0; index < 64; index++) {
-		if (!(index % 8) && index) ft_printf(" ");
-		ft_printf("%d", (n >> (63 - index)) & 1);
-	}
-	ft_printf("\n");
 }
 
 void	generateKey(unsigned long key, unsigned long *keys) {
@@ -179,7 +178,6 @@ void	generateKey(unsigned long key, unsigned long *keys) {
 		left = shiftLeft28(left,  KEY_shift[index]);
 		concat = (left << 28) | right;
 		keys[index] = permutation(concat, KEY_permu, 56, 48);
-		// ft_printf("%lx\n", keys[index]);
 	}
 }
 
@@ -190,22 +188,22 @@ unsigned long desEncrypt(unsigned long bloc, unsigned long *keys) {
 	unsigned long left, right, tmp;
 	unsigned long ret;
 
-	ft_printf("Bloc:\n");
-	print_long(bloc);
 	bloc = permutation(bloc, INIT_permu, 64, 64);
+	left = bloc >> 32;
+	right = bloc & 0xffffffff;
 	for (int index = 0; index < 16; index++) {
 		tmp = right;
 		// E
 		right = permutation(right, E_permu, 32, 48);
 		right = right ^ keys[index];
 		// Substitution
-		right = (unsigned long)substitution(right, keys[index]);
+		right = substitution(right);
 		// P
-		right = permutation(right, P_permu, 48, 32);
+		right = permutation(right, P_permu, 32, 32);
 		right = right ^ left;
 		left = tmp;
 	}
-	// ft_memcpy(((unsigned char *)&ret) + 4, &right, 4);
+	ret = (right << 32) | left;
 	// FINAL
 	ret = permutation(ret, FINAL_permu, 64, 64);
 	return ret;
