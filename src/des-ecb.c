@@ -74,7 +74,7 @@ void desECB_Router(char **argv) {
 		if (len != 8 * DES_SIZE_READ) break;
 	}
 	if (isDecode && prevLen && ((unsigned char*)cipherText)[prevLen - 1] <= 8) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
-	if (!ft_tabfind(opt.opt, "-d") && ft_tabfind(opt.opt, "-a")) {
+	if (!isDecode && isBase64) {
 		base64Encode((char *)cipherText, prevLen, 1);
 	} else {
 		write(1, cipherText, prevLen);

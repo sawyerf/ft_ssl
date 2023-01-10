@@ -101,11 +101,15 @@ size_t	base64DecodeRC(unsigned char *message, size_t size, char *output) {
 	isDebug = 1;
 
 	for (; index < (unsigned int)size - size % 4; index += 4) {
-		for (int i = 0; i < 4; i++) {
+		int i = 0;
+		for (; i < 4; i++) {
+			if (message[index + i] == '=') {
+				break;
+			}
 			output[indexO + i] = getIndex(message[index + i]);
 		}
 		compressBase64(output + indexO);
-		indexO += 3;
+		indexO += i - 1;
 	}
 	return indexO;
 }
