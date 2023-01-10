@@ -96,6 +96,20 @@ void	compressBase64(char *str) {
 	str[3] = 0;
 }
 
+size_t	base64DecodeRC(unsigned char *message, size_t size, char *output) {
+	unsigned int index = 0, indexO = 0;
+	isDebug = 1;
+
+	for (; index < (unsigned int)size - size % 4; index += 4) {
+		for (int i = 0; i < 4; i++) {
+			output[indexO + i] = getIndex(message[index + i]);
+		}
+		compressBase64(output + indexO);
+		indexO += 3;
+	}
+	return indexO;
+}
+
 void	base64Decode(unsigned char *message, size_t size, int fd) {
 	unsigned int index = 0;
 	unsigned char tmp[4];

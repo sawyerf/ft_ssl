@@ -8,38 +8,66 @@ void optionsDesECB(char **argv, char **key, t_optpars *optpars) {
 	ft_bzero(optpars, sizeof(t_optpars));
 	opt_init(&opt);
 	opt_addvar2(&opt, "-k", (void*)key, OPT_STR);
+	opt_addvar2(&opt, "-d", NULL, 0);
 	ret = opt_parser(opt, argv, optpars, "ft_ssl");
 	opt_free(&opt);
 	if (ret)
 		exit(ret);
+	if (!*key || ft_strlen(*key) != 16) {
+		ft_dprintf(2, "key: bad Format");
+		exit(1);
+	}
 	// isDebug = ft_tabfind(optpars->opt, "-v") > 0;
+}
+
+void revTabLong(unsigned long *tab, int size) {
+	unsigned long tmp;
+
+	for (int index = 0; index < size / 2; index++) {
+		tmp = tab[index];
+		tab[index] = tab[size - 1 - index];
+		tab[size - 1 - index] = tmp;
+	}
 }
 
 void desECB_Router(char **argv) {
 	t_optpars opt;
 	char	*keyStr = NULL;
 	unsigned long key, keys[16], data[3], cipherText[3];
-	int len = 0;
+	int isDecode;
+	ssize_t len = 0, prevLen = 0;
+	int oneTwoThree = 0;
 
 	optionsDesECB(argv, &keyStr, &opt);
-	if (!keyStr || ft_strlen(keyStr) != 16) {
-		ft_dprintf(2, "key: bad Format");
-		exit(1);
-	}
+	isDecode = ft_tabfind(opt.opt, "-d");
 	key = atoi_hex(keyStr);
 
 	generateKey(key, keys);
-	while ((len = turboRead(0, data, 8 * 3)) > 0) {
+	if (isDecode) {
+		revTabLong(keys, 16);
+	}
+	while ((len = turboRead(0, data, 8 * 3)) >= 0) {
 		int index;
 
-		if (len != 8*3) {
-			desPadding(data, len);
-			len = len + (8 - len % 8);
+		// if (isDecode && !len) break;
+		if (isDecode && !len) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
+		write(1, cipherText, prevLen);
+
+		prevLen = len;
+		if (!isDecode && len != 8*3) {
+			prevLen = desPadding(data, len);
 		}
-		for (index = 0; index < len / 8; index++) {
-			cipherText[index] = desEncrypt(data[index], keys);
+		for (index = 0; index < prevLen / 8; index++) {
+			if (isDecode) {
+				// base64DecodeRC((unsigned char*)data, len, (unsigned char*)data);
+				cipherText[index] = desEncrypt(data[index], keys);
+			} else {
+				cipherText[index] = desEncrypt(data[index], keys);
+			}
 		}
-		base64Encode((char *)cipherText, len, 1);
+		// if (!ft_tabfind(opt.opt, "-d")) base64Encode((char *)cipherText, len, 1);
 		if (len != 8*3) break;
 	}
+	if (isDecode && prevLen) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
+	write(1, cipherText, prevLen);
 }

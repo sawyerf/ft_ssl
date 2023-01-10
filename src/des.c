@@ -165,12 +165,15 @@ unsigned long substitution(unsigned long right) {
 	return ret;
 }
 
-void	desPadding(void *d, size_t size) {
+size_t	desPadding(void *d, size_t size) {
 	char *data = (char*)d;
+	unsigned int pad = 8 - (size % 8);
 
-	for (int i = 0; i < 8 - (size % 8); i++) {
-		data[size + i] = 64; //(size % 8) * 8;
+	for (int i = 0; i < pad; i++) {
+		// ft_printf("%d %d\n", size + i, pad);
+		data[size + i] = pad;
 	}
+	return size + pad;
 }
 
 void	generateKey(unsigned long key, unsigned long *keys) {

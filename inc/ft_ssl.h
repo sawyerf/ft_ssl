@@ -70,11 +70,12 @@ void sha512PrintHash(t_hash *hash);
 void	base64Router(char **argv);
 void	base64Encode(unsigned char *message, size_t size, int fd);
 void	base64Decode(unsigned char *message, size_t size, int fd);
+size_t	base64DecodeRC(unsigned char *message, size_t size, char *output);
 
 // DES
 void	generateKey(unsigned long key, unsigned long *keys);
 unsigned long desEncrypt(unsigned long bloc, unsigned long *keys);
-void	desPadding(void *d, size_t size);
+size_t	desPadding(void *d, size_t size);
 
 // DES-ECB
 void desECB_Router(char **argv);
