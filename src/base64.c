@@ -145,7 +145,7 @@ void	base64Router(char **argv) {
 			exit(1);
 		}
 	}
-	while ((len = turboRead(fdi, data, 120)) > 0) {
+	while ((len = turboRead(fdi, data, 120, ft_tabfind(opt.opt, "-d"))) > 0) {
 		if (ft_tabfind(opt.opt, "-d")) {
 			base64Decode(data, len, fdo);
 		} else {

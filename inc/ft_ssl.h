@@ -96,7 +96,7 @@ unsigned int leftRotate(unsigned int n, unsigned int d);
 unsigned int rightRotate(unsigned int n, unsigned int d);
 unsigned int rightShift(unsigned int n, unsigned int d);
 unsigned long rightRotate64(unsigned long n, unsigned long d);
-ssize_t turboRead(int fd, void *data, size_t sizeBloc);
+ssize_t turboRead(int fd, void *data, size_t sizeBloc, int isDelWhite);
 void	turboNShift(void *n, int size);
 unsigned long	atoi_hex(char *str);
 

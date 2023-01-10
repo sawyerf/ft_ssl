@@ -75,14 +75,31 @@ unsigned int rightShift(unsigned int n, unsigned int d) {
 	return (n >> d);
 }
 
-ssize_t turboRead(int fd, void *data, size_t sizeBloc) {
+size_t delWhiteSpace(char *str, size_t size) {
+	int decal = 0;
+	int index = 0;
+
+	for (; index + decal < size; index++) {
+		while (str[index + decal] == ' ' || str[index + decal] == '\r' || str[index + decal] == '\t' || str[index + decal] == '\n') {
+			decal++;
+		}
+		str[index] = str[index + decal];
+	}
+	return index;
+}
+
+ssize_t turboRead(int fd, void *data, size_t sizeBloc, int isDelWhite) {
 	unsigned char buffer[128];
 	ssize_t len;
 	size_t size = 0;
 
 	ft_bzero(data, sizeBloc);
 	while ((len = read(fd, data + size, sizeBloc - size)) > 0) {
-		size += len;
+		if (isDelWhite) {
+			size += delWhiteSpace(data + size, len);
+		} else {
+			size += len;
+		}
 		if (size == sizeBloc) {
 			return (size);
 		}
