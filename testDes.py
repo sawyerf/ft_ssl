@@ -17,9 +17,8 @@ def runCommands(stdin, key, name):
 		print(name)
 		print(stdin)
 		print(e)
-		print(myStdout)
-		# print(type(myStdoutB64))
 		print('============= FAIL ===============')
+		return
 
 	stdin = stdin.encode()
 	if (myStdout == stdin and myStdoutB64 == stdin):
@@ -38,6 +37,7 @@ def runCommands(stdin, key, name):
 
 
 for index in range(150):
-	runCommands('A' * index, '0123456789ABCDEF', f"'A' * {index}")
+	for key in ['0123456789ABCDEF', '012' '0', '122AAABBBBCCCEDEDFEFE5546546']:
+		runCommands('A' * index, key, f"'A' * {index}")
 
 runCommands('A' * 100000 , '0123456789ABCDEF', f"'A' * 10000")
