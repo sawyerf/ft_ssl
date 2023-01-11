@@ -40,48 +40,51 @@ append padding until len in bits ≡ 0 (mod 64)
 
 var long key // The keys given by the user
 var long keys[16]
+var long left, right
 
 // Generate Keys
-key := permutation(key, C_permu, 64, 56)
+
+// PC1 (64bits to 56bits) 
+key := permutation(key, PC1)
 left := (key rightshift 28) and 0xFFFFFFF
 right := key and 0xFFFFFFF
-for i from 0 to 16 do
-	var long left, right
 
+for i from 0 to 16 do
 	right := right rightrotate KEY_shift[i]
 	left := left rightrotate  KEY_shift[i]
 	var long concat := (left leftshift 28) or right
-	keys[i] := permutation(concat, KEY_permu, 56, 48)
+	// PC2 (56bits to 48bits)
+	keys[i] := permutation(concat, PC2)
 end for
 
-// if you decrypt you need to reverse keys order
 if decrypt do
 	reverse keys
 end if
 
 // Encrypt or Decrypt
 for each 64-bit chunk of padded message do
-	var long left, right, tmp
+	var long tmp
 
-	chunk := permutation(chunk, INIT_permu, 64, 64)
+	// IP
+	chunk := permutation(chunk, IP)
 	left := chunk rightshift 32
 	right := chunk and 0xFFFFFFFF
 	for i from 0 to 16 do
 		tmp := right
-		// E
-		right := permutation(right, E_permu, 32, 48)
+		// E (32bits to 48bits)
+		right := expansion(right, E)
 		right := right xor keys[i]
-		// Substitution
+		// Substitution (48bits to 32bits)
 		right := substitution(right)
 		// P
-		right := permutation(right, P_permu, 32, 32)
+		right := permutation(right, P)
 		right := right xor left
 		left := tmp
 	end for
 	// Concat right and left
 	var long cipher_chunk := (right rightshift 32) or left
-	// FINAL
-	cipher_chunk := permutation(cipher_chunk, FINAL_permu, 64, 64)
+	// FP
+	cipher_chunk := permutation(cipher_chunk, FP)
 end for
 ```
 
