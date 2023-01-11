@@ -14,8 +14,8 @@ void optionsDesECB(char **argv, t_optpars *optpars, char *key, int *isDecode, in
 	opt_addvar2(&opt, "-d", NULL, 0);
 	opt_addvar2(&opt, "-a", NULL, 0);
 	opt_addvar2(&opt, "-e", NULL, 0);
-	opt_addvar2(&opt, "-i", (void**)&input, OPT_STR); // TODO
-	opt_addvar2(&opt, "-o", (void**)&output, OPT_STR); // TODO
+	opt_addvar2(&opt, "-i", (void**)&input, OPT_STR);
+	opt_addvar2(&opt, "-o", (void**)&output, OPT_STR);
 	ret = opt_parser(opt, argv, optpars, "ft_ssl");
 	opt_free(&opt);
 	if (ret)

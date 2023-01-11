@@ -1,0 +1,54 @@
+ {{color|green|// ''NOTE: long variables are 64bits''}}
+ 
+ {{color|green|// ''Pre-processing: padding with zeros''}}
+ '''append''' padding '''until''' len in bits ≡ 0 (mod 64)
+ 
+ '''var''' long key {{color|green|// ''The key given by the user''}}
+ '''var''' long keys[16]
+ '''var''' long left, right
+ 
+ {{color|green|// '' Generate Keys''}}
+ 
+ {{color|green|// ''PC1 (64bits to 56bits) ''}}
+ key := permutation(key, PC1)
+ left := (key '''rightshift''' 28) '''and''' 0xFFFFFFF
+ right := key '''and''' 0xFFFFFFF
+ 
+ '''for''' i '''from''' 0 '''to''' 16 '''do'''
+ 	right := right '''rightrotate''' KEY_shift[i]
+ 	left := left '''rightrotate'''  KEY_shift[i]
+ 	'''var''' long concat := (left '''leftshift''' 28) '''or''' right
+ 	{{color|green|// ''PC2 (56bits to 48bits)''}}
+ 	keys[i] := permutation(concat, PC2)
+ '''end for'''
+ 
+ {{color|green|// ''To decrypt a message reverse the order of the keys''}}
+ '''if''' decrypt '''do'''
+ 	reverse keys
+ '''end if'''
+ 
+ {{color|green|// ''Encrypt or Decrypt''}}
+ '''for each''' 64-bit chunk '''of''' padded message '''do'''
+ 	'''var''' long tmp
+ 
+ 	{{color|green|// ''IP''}}
+ 	chunk := permutation(chunk, IP)
+ 	left := chunk '''rightshift''' 32
+ 	right := chunk '''and''' 0xFFFFFFFF
+ 	'''for''' i '''from''' 0 '''to''' 16 '''do'''
+ 		tmp := right
+ 		{{color|green|// ''E (32bits to 48bits)''}}
+ 		right := expansion(right, E)
+ 		right := right '''xor''' keys[i]
+ 		{{color|green|// ''Substitution (48bits to 32bits)''}}
+ 		right := substitution(right)
+ 		{{color|green|// ''P''}}
+ 		right := permutation(right, P)
+ 		right := right '''xor''' left
+ 		left := tmp
+ 	'''end for'''
+ 	{{color|green|// ''Concat right '''and''' left''}}
+ 	'''var''' long cipher_chunk := (right '''rightshift''' 32) '''or''' left
+ 	{{color|green|// ''FP''}}
+ 	cipher_chunk := permutation(cipher_chunk, FP)
+ '''end for'''
