@@ -37,6 +37,8 @@ unsigned char	getIndex(char car) {
 			return (index);
 		}
 	}
+	ft_dprintf(2, "Error: Decoding base64\n");
+	exit(1);
 	return 0;
 }
 
