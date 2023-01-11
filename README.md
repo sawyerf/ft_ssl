@@ -33,6 +33,58 @@ Ces 3 fonctions de hashage se base sur la construction de [Merkle-Damgard](https
 
 ![lol](https://www.hds.utc.fr/~wschon/sr06/crypto/images/md5_1.gif)
 
+## Pseudo Code DES
+```C
+// Pre-processing: padding with zeros
+append padding until len in bits ≡ 0 (mod 64)
+
+var long key // The keys given by the user
+var long keys[16]
+
+// Generate Keys
+key := permutation(key, C_permu, 64, 56)
+left := (key rightshift 28) and 0xFFFFFFF
+right := key and 0xFFFFFFF
+for i from 0 to 16 do
+	var long left, right
+
+	right := right rightrotate KEY_shift[i]
+	left := left rightrotate  KEY_shift[i]
+	var long concat := (left leftshift 28) or right
+	keys[i] := permutation(concat, KEY_permu, 56, 48)
+end for
+
+// if you decrypt you need to reverse keys order
+if decrypt do
+	reverse keys
+end if
+
+// Encrypt or Decrypt
+for each 64-bit chunk of padded message do
+	var long left, right, tmp
+
+	chunk := permutation(chunk, INIT_permu, 64, 64)
+	left := chunk rightshift 32
+	right := chunk and 0xFFFFFFFF
+	for i from 0 to 16 do
+		tmp := right
+		// E
+		right := permutation(right, E_permu, 32, 48)
+		right := right xor keys[i]
+		// Substitution
+		right := substitution(right)
+		// P
+		right := permutation(right, P_permu, 32, 32)
+		right := right xor left
+		left := tmp
+	end for
+	// Concat right and left
+	var long cipher_chunk := (right rightshift 32) or left
+	// FINAL
+	cipher_chunk := permutation(cipher_chunk, FINAL_permu, 64, 64)
+end for
+```
+
 ## Source
 - [Youtube - Complément : Fonctions de hachage](https://www.youtube.com/watch?v=-k_axU98AZ4)
 - [Wikipedia MD5](https://fr.wikipedia.org/wiki/MD5)
