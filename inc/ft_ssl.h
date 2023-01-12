@@ -44,8 +44,6 @@ typedef struct		s_des
 {
 	int				fdInput;
 	int				fdOutput;
-	char			keyStr[17];
-	char			ivStr[17];
 	unsigned long	key;
 	unsigned long	iv;
 	int				isDecode;

@@ -5,7 +5,7 @@ extern t_router routes[];
 void pbkdf2(char *password, unsigned long salt, t_hash *hash) {
 	t_router *route = routes + 4; // sha512
 	size_t	lenPass = ft_strlen(password);
-	char	*concat = malloc(lenPass + 8*8 + 4);
+	char	*concat = malloc(lenPass + 8*8 + 4 + 1);
 	unsigned index = 1;
 
 	ft_bzero(hash, sizeof(t_hash));

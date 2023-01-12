@@ -2,66 +2,76 @@
 #include "ft_ssl.h"
 #include <fcntl.h> 
 #include <stdlib.h>
+#include <unistd.h>
 #include <time.h>
+
+void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg) {
+	if (!keyArg) {
+		t_hash hash;
+		char saltStr[17];
+		unsigned long salt;
+
+		if (!saltArg) {
+			srandom(time(NULL));
+			salt = random() | random() << 32;
+		} else {
+
+			ft_memset(saltStr, '0', 16);
+			ft_memcpy(saltStr, saltArg, ft_strlen(saltArg) <= 16 ? ft_strlen(saltArg) : 16);
+			saltStr[16] = 0;
+			salt = atoi_hex(saltStr);
+		}
+		if (!passArg) {
+			passArg = getpass("Password: "); // TODO: Free passArg
+			pbkdf2(passArg, salt, &hash);
+			free(passArg);
+		} else {
+			pbkdf2(passArg, salt, &hash);
+		}
+		desO->key = hash.HH0;
+		desO->iv = hash.HH1;
+		ft_printf("salt=%016lx\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
+	} else {
+		char keyStr[17];
+
+		if (!isHex(keyArg)) {
+			ft_dprintf(2, "key: Bad format\n");
+			exit(1);
+		}
+		ft_memset(keyStr, '0', 16);
+		ft_memcpy(keyStr, keyArg, ft_strlen(keyArg) <= 16 ? ft_strlen(keyArg) : 16);
+		keyStr[16] = 0;
+		desO->key = atoi_hex(keyStr);
+	}
+}
 
 void optionsDesECB(char **argv, t_optpars *optpars, t_des *desO) {
 	t_opt	*opt;
 	unsigned char ret;
-	char *keyStr = NULL;
-	char	*input = NULL,
+	char	*keyArg = NULL,
+	    	*input = NULL,
 			*output = NULL,
-			*ivStr = NULL,
-			*passStr = NULL,
-			*saltStr = NULL;
+			*ivArg = NULL,
+			*passArg = NULL,
+			*saltArg = NULL;
 
 	ft_bzero(optpars, sizeof(t_optpars));
 	opt_init(&opt);
-	opt_addvar2(&opt, "-k", (void**)&keyStr, OPT_STR);
+	opt_addvar2(&opt, "-k", (void**)&keyArg, OPT_STR);
 	opt_addvar2(&opt, "-d", NULL, 0);
 	opt_addvar2(&opt, "-a", NULL, 0);
 	opt_addvar2(&opt, "-e", NULL, 0);
 	opt_addvar2(&opt, "-i", (void**)&input, OPT_STR);
 	opt_addvar2(&opt, "-o", (void**)&output, OPT_STR);
-	opt_addvar2(&opt, "-v", (void**)&ivStr, OPT_STR); // TODO
-	opt_addvar2(&opt, "-p", (void**)&passStr, OPT_STR); // TODO
-	opt_addvar2(&opt, "-s", (void**)&saltStr, OPT_STR); // TODO
+	opt_addvar2(&opt, "-v", (void**)&ivArg, OPT_STR); // TODO
+	opt_addvar2(&opt, "-p", (void**)&passArg, OPT_STR); // TODO
+	opt_addvar2(&opt, "-s", (void**)&saltArg, OPT_STR); // TODO
 	ret = opt_parser(opt, argv, optpars, "ft_ssl");
 	opt_free(&opt);
 	if (ret)
 		exit(ret);
-	if (!keyStr) {
-		t_hash hash;
-		unsigned long salt;
 
-		if (!saltStr) {
-			srandom(time(NULL));
-			salt = random() | random() << 32;
-		} else {
-			char saltStr2[17];
-			ft_memset(saltStr2, '0', 16);
-			ft_memcpy(saltStr2, saltStr, ft_strlen(saltStr2) <= 16 ? ft_strlen(saltStr2) : 16);
-			saltStr2[16] = 0;
-			salt = atoi_hex(saltStr2);
-		}
-		if (!passStr) {
-			// TODO: Ask paddword
-			exit(1);
-		}
-		pbkdf2(passStr, salt, &hash);
-		desO->key = hash.HH0;
-		desO->iv = hash.HH1;
-		ft_printf("salt=%lX\nkey=%lX\niv=%lX\n", salt, desO->key, desO->iv);
-	} else {
-		if (!isHex(keyStr)) {
-			ft_dprintf(2, "key: Bad format\n");
-			exit(1);
-		}
-		ft_memset(desO->keyStr, '0', 16);
-		ft_memcpy(desO->keyStr, keyStr, ft_strlen(keyStr) <= 16 ? ft_strlen(keyStr) : 16);
-		desO->keyStr[16] = 0;
-		desO->key = atoi_hex(desO->keyStr);
-	}
-
+	setKey(desO, keyArg, passArg, saltArg);
 	desO->isBase64 = ft_tabfind(optpars->opt, "-a");
 	desO->isDecode = 1;
 	if (ft_tabfind(optpars->opt, "-e") || !ft_tabfind(optpars->opt, "-d")) {
