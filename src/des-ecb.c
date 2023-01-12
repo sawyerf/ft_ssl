@@ -1,32 +1,66 @@
 #include "libft.h"
 #include "ft_ssl.h"
 #include <fcntl.h> 
+#include <stdlib.h>
+#include <time.h>
 
 void optionsDesECB(char **argv, t_optpars *optpars, t_des *desO) {
 	t_opt	*opt;
 	unsigned char ret;
 	char *keyStr = NULL;
-	char *input = NULL, *output = NULL;
+	char	*input = NULL,
+			*output = NULL,
+			*ivStr = NULL,
+			*passStr = NULL,
+			*saltStr = NULL;
 
 	ft_bzero(optpars, sizeof(t_optpars));
 	opt_init(&opt);
-	opt_addvar2(&opt, "-k", (void*)&keyStr, OPT_STR);
+	opt_addvar2(&opt, "-k", (void**)&keyStr, OPT_STR);
 	opt_addvar2(&opt, "-d", NULL, 0);
 	opt_addvar2(&opt, "-a", NULL, 0);
 	opt_addvar2(&opt, "-e", NULL, 0);
 	opt_addvar2(&opt, "-i", (void**)&input, OPT_STR);
 	opt_addvar2(&opt, "-o", (void**)&output, OPT_STR);
+	opt_addvar2(&opt, "-v", (void**)&ivStr, OPT_STR); // TODO
+	opt_addvar2(&opt, "-p", (void**)&passStr, OPT_STR); // TODO
+	opt_addvar2(&opt, "-s", (void**)&saltStr, OPT_STR); // TODO
 	ret = opt_parser(opt, argv, optpars, "ft_ssl");
 	opt_free(&opt);
 	if (ret)
 		exit(ret);
-	if (!isHex(keyStr)) {
-		ft_dprintf(2, "key: Bad format\n");
-		exit(1);
+	if (!keyStr) {
+		t_hash hash;
+		unsigned long salt;
+
+		if (!saltStr) {
+			srandom(time(NULL));
+			salt = random() | random() << 32;
+		} else {
+			char saltStr2[17];
+			ft_memset(saltStr2, '0', 16);
+			ft_memcpy(saltStr2, saltStr, ft_strlen(saltStr2) <= 16 ? ft_strlen(saltStr2) : 16);
+			saltStr2[16] = 0;
+			salt = atoi_hex(saltStr2);
+		}
+		if (!passStr) {
+			// TODO: Ask paddword
+			exit(1);
+		}
+		pbkdf2(passStr, salt, &hash);
+		desO->key = hash.HH0;
+		desO->iv = hash.HH1;
+		ft_printf("salt=%lX\nkey=%lX\niv=%lX\n", salt, desO->key, desO->iv);
+	} else {
+		if (!isHex(keyStr)) {
+			ft_dprintf(2, "key: Bad format\n");
+			exit(1);
+		}
+		ft_memset(desO->keyStr, '0', 16);
+		ft_memcpy(desO->keyStr, keyStr, ft_strlen(keyStr) <= 16 ? ft_strlen(keyStr) : 16);
+		desO->keyStr[16] = 0;
+		desO->key = atoi_hex(desO->keyStr);
 	}
-	ft_memset(desO->keyStr, '0', 16);
-	ft_memcpy(desO->keyStr, keyStr, ft_strlen(keyStr) <= 16 ? ft_strlen(keyStr) : 16);
-	desO->keyStr[16] = 0;
 
 	desO->isBase64 = ft_tabfind(optpars->opt, "-a");
 	desO->isDecode = 1;
@@ -59,16 +93,15 @@ void revTabLong(unsigned long *tab, int size) {
 void desECB_Router(char **argv) {
 	t_des	desO;
 	t_optpars opt;
-	unsigned long key, keys[16], data[DES_SIZE_READ], cipherText[DES_SIZE_READ];
+	unsigned long keys[16], data[DES_SIZE_READ], cipherText[DES_SIZE_READ];
 	ssize_t len = 0, prevLen = 0;
 
 	ft_bzero(&desO, sizeof(t_des));
 	ft_bzero(cipherText, DES_SIZE_READ * 8);
 
 	optionsDesECB(argv, &opt, &desO);
-	key = atoi_hex(desO.keyStr);
 
-	generateKey(key, keys);
+	generateKey(desO.key, keys);
 	if (desO.isDecode) {
 		revTabLong(keys, 16);
 	}

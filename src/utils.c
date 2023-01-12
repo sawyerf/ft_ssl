@@ -1,6 +1,6 @@
 #include "ft_ssl.h"
 
-int isDebug = 1;
+int isDebug = 0;
 
 void print_bit(unsigned char n) {
 	for (int i = 7; i >= 0; i--) {
@@ -13,7 +13,7 @@ void print_bits(void *str, size_t len) {
 	if (!isDebug) return ;
 	for (size_t i = 0; i < len; i++) {
 		if (!(i % 8)) ft_printf("\n");
-		print_bit(((unsigned char *)str)[i]);
+		// print_bit(((unsigned char *)str)[i]);
 	}
 	ft_printf("\n");
 }

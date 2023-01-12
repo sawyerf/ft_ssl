@@ -45,6 +45,9 @@ typedef struct		s_des
 	int				fdInput;
 	int				fdOutput;
 	char			keyStr[17];
+	char			ivStr[17];
+	unsigned long	key;
+	unsigned long	iv;
 	int				isDecode;
 	int				isBase64;
 }					t_des;
@@ -92,6 +95,10 @@ void desECB_Router(char **argv);
 // router
 t_router	*getRouter(char *name);
 void router(char **argv, t_router *router);
+void getArg(char *message, size_t len, t_hash *hash, t_router *route);
+
+// PBKDF2
+void pbkdf2(char *password, unsigned long salt, t_hash *hash);
 
 // Print
 void print_bits(void *str, size_t len);

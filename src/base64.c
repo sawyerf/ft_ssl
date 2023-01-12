@@ -72,7 +72,6 @@ void	base64EncodeBloc(unsigned char *message, int size, int fd) {
 
 void	base64Encode(unsigned char *message, size_t size, int fd) {
 	unsigned int index = 0;
-	isDebug = 1;
 
 	for (; index < (unsigned int)size - size % 3; index += 3) {
 		base64EncodeBloc(message + index, 3, fd);
@@ -100,7 +99,6 @@ void	compressBase64(char *str) {
 
 size_t	base64DecodeRC(unsigned char *message, size_t size, char *output) {
 	unsigned int index = 0, indexO = 0;
-	isDebug = 1;
 
 	for (; index < (unsigned int)size - size % 4; index += 4) {
 		int i = 0;
@@ -119,7 +117,6 @@ size_t	base64DecodeRC(unsigned char *message, size_t size, char *output) {
 void	base64Decode(unsigned char *message, size_t size, int fd) {
 	unsigned int index = 0;
 	unsigned char tmp[4];
-	isDebug = 1;
 
 	for (; index < (unsigned int)size - size % 4; index += 4) {
 		bzero(tmp, 4);

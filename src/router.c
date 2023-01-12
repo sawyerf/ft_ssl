@@ -37,8 +37,7 @@ void getFd(int fd, t_hash *hash, int isPrint, t_router *route) {
 	route->padding(input, size, hash);
 }
 
-void getArg(char *message, t_hash *hash, t_router *route) {
-	size_t	len = ft_strlen(message);
+void getArg(char *message, size_t len, t_hash *hash, t_router *route) {
 	size_t	index = 0;
 	unsigned char	current[128];
 
@@ -77,7 +76,7 @@ void router(char **argv, t_router *route) {
 	}
 	// -s message
 	if (message) {
-		getArg(message, &hash, route);
+		getArg(message, ft_strlen(message), &hash, route);
 		if (!ft_tabfind(opt.opt, "-q") && !ft_tabfind(opt.opt, "-r")) ft_printf("%s(\"%s\")= ", route->algo, message);
 		route->printHash(&hash);
 		if (!ft_tabfind(opt.opt, "-q") && ft_tabfind(opt.opt, "-r")) ft_printf(" \"%s\"", message);

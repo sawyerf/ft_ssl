@@ -19,6 +19,7 @@ SRC_FILE =	main.c \
 			sha512.c \
 			base64.c \
 			router.c \
+			pbkdf2.c \
 
 CFLAGS =	-I $(INC_DIR) -I libft/inc/ -g # -Wall -Werror -Wextra
 

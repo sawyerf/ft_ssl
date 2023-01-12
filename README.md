@@ -34,6 +34,7 @@ Ces 3 fonctions de hashage se base sur la construction de [Merkle-Damgard](https
 ![lol](https://www.hds.utc.fr/~wschon/sr06/crypto/images/md5_1.gif)
 
 ## Pseudo Code DES
+{{syntaxhighlight|lang=C|code=}}
 ```C
 // Pre-processing: padding with zeros
 append padding until len in bits ≡ 0 (mod 64)
@@ -57,6 +58,7 @@ for i from 0 to 16 do
 	keys[i] := permutation(concat, PC2)
 end for
 
+// To decrypt a message reverse the order of the keys
 if decrypt do
 	reverse keys
 end if
