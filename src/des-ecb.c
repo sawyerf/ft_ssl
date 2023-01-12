@@ -2,11 +2,11 @@
 #include "ft_ssl.h"
 #include <fcntl.h> 
 
-void optionsDesECB(char **argv, t_optpars *optpars, char *key, int *isDecode, int *fdInput, int *fdOutput) {
+void optionsDesECB(char **argv, t_optpars *optpars, t_des *desO) {
 	t_opt	*opt;
 	unsigned char ret;
 	char *keyStr = NULL;
-	char *input, *output;
+	char *input = NULL, *output = NULL;
 
 	ft_bzero(optpars, sizeof(t_optpars));
 	opt_init(&opt);
@@ -20,23 +20,25 @@ void optionsDesECB(char **argv, t_optpars *optpars, char *key, int *isDecode, in
 	opt_free(&opt);
 	if (ret)
 		exit(ret);
-	if (!keyStr) {
-		ft_dprintf(2, "key: bad Format");
+	if (!isHex(keyStr)) {
+		ft_dprintf(2, "key: Bad format\n");
 		exit(1);
 	}
-	ft_memset(key, '0', 16);
-	ft_memcpy(key, keyStr, ft_strlen(keyStr) <= 16 ? ft_strlen(keyStr) : 16);
-	key[16] = 0;
+	ft_memset(desO->keyStr, '0', 16);
+	ft_memcpy(desO->keyStr, keyStr, ft_strlen(keyStr) <= 16 ? ft_strlen(keyStr) : 16);
+	desO->keyStr[16] = 0;
 
-	*isDecode = 1;
+	desO->isBase64 = ft_tabfind(optpars->opt, "-a");
+	desO->isDecode = 1;
 	if (ft_tabfind(optpars->opt, "-e") || !ft_tabfind(optpars->opt, "-d")) {
-		*isDecode = 0;
+		desO->isDecode = 0;
 	}
-	if (input && (*fdInput = open(input, O_RDONLY)) < 0) {
+	desO->fdOutput = 1;
+	if (input && (desO->fdInput = open(input, O_RDONLY)) < 0) {
 		ft_dprintf(2, "ERROR: Can't open file `%s'\n", input);
 		exit(1);
 	}
-	if (output && (*fdOutput = open(output, O_RDWR | O_CREAT, 0644)) < 0) {
+	if (output && (desO->fdOutput = open(output, O_RDWR | O_CREAT, 0644)) < 0) {
 		ft_dprintf(2, "ERROR: Can't open file `%s'\n", output);
 		exit(1);
 	}
@@ -55,39 +57,38 @@ void revTabLong(unsigned long *tab, int size) {
 #define DES_SIZE_READ 3 * 4
 
 void desECB_Router(char **argv) {
+	t_des	desO;
 	t_optpars opt;
-	char	keyStr[17];
 	unsigned long key, keys[16], data[DES_SIZE_READ], cipherText[DES_SIZE_READ];
-	int isDecode, isBase64;
-	int fdInput = 0, fdOutput = 1;
 	ssize_t len = 0, prevLen = 0;
 
-	optionsDesECB(argv, &opt, keyStr, &isDecode, &fdInput, &fdOutput);
-	isBase64 = ft_tabfind(opt.opt, "-a");
-	key = atoi_hex(keyStr);
+	ft_bzero(&desO, sizeof(t_des));
+	ft_bzero(cipherText, DES_SIZE_READ * 8);
 
-	bzero(cipherText, DES_SIZE_READ * 8);
+	optionsDesECB(argv, &opt, &desO);
+	key = atoi_hex(desO.keyStr);
+
 	generateKey(key, keys);
-	if (isDecode) {
+	if (desO.isDecode) {
 		revTabLong(keys, 16);
 	}
-	while ((len = turboRead(fdInput, data, 8 * DES_SIZE_READ, isDecode & isBase64)) >= 0) {
+	while ((len = turboRead(desO.fdInput, data, 8 * DES_SIZE_READ, desO.isDecode & desO.isBase64)) >= 0) {
 		int index;
 
-		if (isDecode && !len && prevLen) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
-		if (!isDecode && isBase64) {
-			base64Encode((char *)cipherText, prevLen, fdOutput);
+		if (desO.isDecode && !len && prevLen) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
+		if (!desO.isDecode && desO.isBase64) {
+			base64Encode((char *)cipherText, prevLen, desO.fdOutput);
 		} else {
-			write(fdOutput, cipherText, prevLen);
+			write(desO.fdOutput, cipherText, prevLen);
 		}
 
 		prevLen = len;
-		if (!isDecode && len != 8 * DES_SIZE_READ) {
+		if (!desO.isDecode && len != 8 * DES_SIZE_READ) {
 			prevLen = desPadding(data, len);
 		}
-		if (isDecode && isBase64) prevLen = base64DecodeRC((unsigned char *)data, len, (unsigned char *)data);
+		if (desO.isDecode && desO.isBase64) prevLen = base64DecodeRC((unsigned char *)data, len, (unsigned char *)data);
 		for (index = 0; index < prevLen / 8; index++) {
-			if (isDecode) {
+			if (desO.isDecode) {
 				cipherText[index] = desEncrypt(data[index], keys);
 			} else {
 				cipherText[index] = desEncrypt(data[index], keys);
@@ -96,14 +97,14 @@ void desECB_Router(char **argv) {
 		if (len != 8 * DES_SIZE_READ) break;
 	}
 	unsigned char padding = ((unsigned char*)cipherText)[prevLen - 1];
-	if (isDecode && prevLen && (padding > 8 || padding > prevLen | !padding)) {
+	if (desO.isDecode && prevLen && (padding > 8 || padding > prevLen | !padding)) {
 		ft_dprintf(2, "Wrong padding\n", prevLen, padding, padding);
 		exit(1);
 	}
-	if (isDecode && prevLen && (((unsigned char*)cipherText)[prevLen - 1] <= len)) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
-	if (!isDecode && isBase64) {
-		base64Encode((char *)cipherText, prevLen, fdOutput);
+	if (desO.isDecode && prevLen && (((unsigned char*)cipherText)[prevLen - 1] <= len)) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
+	if (!desO.isDecode && desO.isBase64) {
+		base64Encode((char *)cipherText, prevLen, desO.fdOutput);
 	} else {
-		write(fdOutput, cipherText, prevLen);
+		write(desO.fdOutput, cipherText, prevLen);
 	}
 }

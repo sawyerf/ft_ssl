@@ -40,6 +40,15 @@ typedef struct		s_router
 	t_printHash		printHash;
 }					t_router;
 
+typedef struct		s_des
+{
+	int				fdInput;
+	int				fdOutput;
+	char			keyStr[17];
+	int				isDecode;
+	int				isBase64;
+}					t_des;
+
 // md5
 void md5InitHash(t_hash *hash);
 void md5EncodeBloc(t_hash *hash, void *message);
@@ -99,5 +108,6 @@ unsigned long rightRotate64(unsigned long n, unsigned long d);
 ssize_t turboRead(int fd, void *data, size_t sizeBloc, int isDelWhite);
 void	turboNShift(void *n, int size);
 unsigned long	atoi_hex(char *str);
+int		isHex(char *str);
 
 #endif
