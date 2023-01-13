@@ -5,8 +5,23 @@
 #include <unistd.h>
 #include <time.h>
 
-void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg) {
-	if (!keyArg) {
+unsigned long keyToLong(char *key, char *name) {
+	char keyStr[17];
+
+	if (!isHex(key)) {
+		ft_dprintf(2, "%s: Bad format\n", name);
+		exit(1);
+	}
+	ft_memset(keyStr, '0', 16);
+	ft_memcpy(keyStr, key, ft_strlen(key) <= 16 ? ft_strlen(key) : 16);
+	keyStr[16] = 0;
+	atoi_hex(keyStr);
+}
+
+void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg) {
+	if (keyArg) desO->key = keyToLong(keyArg, "Key");
+	if (ivArg)  desO->iv = keyToLong(ivArg, "IV");
+	if (!keyArg || !ivArg) {
 		t_hash hash;
 		char saltStr[17];
 		unsigned long salt;
@@ -15,14 +30,10 @@ void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg) {
 			srandom(time(NULL));
 			salt = random() | random() << 32;
 		} else {
-
-			ft_memset(saltStr, '0', 16);
-			ft_memcpy(saltStr, saltArg, ft_strlen(saltArg) <= 16 ? ft_strlen(saltArg) : 16);
-			saltStr[16] = 0;
-			salt = atoi_hex(saltStr);
+			salt = keyToLong(saltArg, "Salt");
 		}
 		if (!passArg) {
-			passArg = getpass("Password: "); // TODO: Free passArg
+			passArg = getpass("Password: ");
 			pbkdf2(passArg, salt, &hash);
 			free(passArg);
 		} else {
@@ -31,17 +42,6 @@ void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg) {
 		desO->key = hash.HH0;
 		desO->iv = hash.HH1;
 		ft_printf("salt=%016lx\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
-	} else {
-		char keyStr[17];
-
-		if (!isHex(keyArg)) {
-			ft_dprintf(2, "key: Bad format\n");
-			exit(1);
-		}
-		ft_memset(keyStr, '0', 16);
-		ft_memcpy(keyStr, keyArg, ft_strlen(keyArg) <= 16 ? ft_strlen(keyArg) : 16);
-		keyStr[16] = 0;
-		desO->key = atoi_hex(keyStr);
 	}
 }
 
@@ -71,7 +71,7 @@ void optionsDesECB(char **argv, t_optpars *optpars, t_des *desO) {
 	if (ret)
 		exit(ret);
 
-	setKey(desO, keyArg, passArg, saltArg);
+	setKey(desO, keyArg, passArg, saltArg, ivArg);
 	desO->isBase64 = ft_tabfind(optpars->opt, "-a");
 	desO->isDecode = 1;
 	if (ft_tabfind(optpars->opt, "-e") || !ft_tabfind(optpars->opt, "-d")) {

@@ -89,6 +89,7 @@ size_t	desPadding(void *d, size_t size);
 
 // DES-ECB
 void desECB_Router(char **argv);
+void optionsDesECB(char **argv, t_optpars *optpars, t_des *desO);
 
 // router
 t_router	*getRouter(char *name);
