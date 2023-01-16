@@ -11,8 +11,11 @@ SRC_DIR =	src
 SRC_FILE =	main.c \
 			utils.c \
 			des.c \
-			des-ecb.c \
 			des-cbc.c \
+			des-cfb.c \
+			des-ctr.c \
+			des-ecb.c \
+			des-ofb.c \
 			md5.c \
 			sha224.c \
 			sha384.c \

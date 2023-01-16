@@ -6,7 +6,7 @@ unsigned long decodeCBC(t_des *des, unsigned long data, unsigned long *keys) {
 
 	cipherText = desEncrypt(data, keys);
 	cipherText ^= des->iv;
-	des->iv = swap64(data);
+	des->iv = data;
 	return (cipherText);
 }
 
@@ -15,6 +15,6 @@ unsigned long encodeCBC(t_des *des, unsigned long data, unsigned long *keys) {
 
 	data ^= des->iv;
 	cipherText = desEncrypt(data, keys);
-	des->iv = swap64(cipherText);
+	des->iv = cipherText;
 	return (cipherText);
 }

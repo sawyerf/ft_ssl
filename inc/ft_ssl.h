@@ -102,10 +102,21 @@ void	routerDES(char **argv, t_router_des *route);
 // DES-ECB
 unsigned long encode_decodeECB(t_des *des, unsigned long data, unsigned long *keys);
 
-
 // DES-CBC
 unsigned long decodeCBC(t_des *des, unsigned long data, unsigned long *keys);
 unsigned long encodeCBC(t_des *des, unsigned long data, unsigned long *keys);
+
+// DES-CFB
+unsigned long decodeCFB(t_des *des, unsigned long data, unsigned long *keys);
+unsigned long encodeCFB(t_des *des, unsigned long data, unsigned long *keys);
+
+// DES-OFB
+unsigned long decodeOFB(t_des *des, unsigned long data, unsigned long *keys);
+unsigned long encodeOFB(t_des *des, unsigned long data, unsigned long *keys);
+
+// DES-CTR
+unsigned long decodeCTR(t_des *des, unsigned long data, unsigned long *keys);
+unsigned long encodeCTR(t_des *des, unsigned long data, unsigned long *keys);
 
 // router
 int		getRouter(char **argv, char *name);
