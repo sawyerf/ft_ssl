@@ -2,14 +2,6 @@
 #include "libft.h"
 #include <fcntl.h> 
 
-t_router routes[] = {
-	{"md5",    "MD5",    64,  &md5InitHash, &md5EncodeBloc, &md5Padding, &md5PrintHash},
-	{"sha224", "SHA224", 64,  &sha224InitHash, &sha256EncodeBloc, &sha256Padding, &sha224PrintHash},
-	{"sha256", "SHA256", 64,  &sha256InitHash, &sha256EncodeBloc, &sha256Padding, &sha256PrintHash},
-	{"sha384", "SHA384", 128, &sha384InitHash, &sha512EncodeBloc, &sha512Padding, &sha384PrintHash},
-	{"sha512", "SHA512", 128, &sha512InitHash, &sha512EncodeBloc, &sha512Padding, &sha512PrintHash}
-};
-
 void getFd(int fd, t_hash *hash, int isPrint, t_router *route) {
 	ssize_t len;
 	size_t size = 0;
@@ -52,7 +44,7 @@ void getArg(char *message, size_t len, t_hash *hash, t_router *route) {
 	route->padding(current, len, hash);
 }
 
-void router(char **argv, t_router *route) {
+void routerHash(char **argv, t_router *route) {
 	char	*message = NULL;
 	t_optpars opt;
 	t_hash	hash;
@@ -97,12 +89,4 @@ void router(char **argv, t_router *route) {
 			close(fd);
 		}
 	}
-}
-
-t_router	*getRouter(char *name) {
-	for (int index = 0; index < 5; index++) {
-		if (!ft_strcmp(routes[index].name, name))
-		return &routes[index];
-	}
-	return NULL;
 }

@@ -1,9 +1,9 @@
 #include "ft_ssl.h"
 
-extern t_router routes[];
+extern t_router routesHash[];
 
 void pbkdf2(char *password, unsigned long salt, t_hash *hash) {
-	t_router *route = routes + 4; // sha512
+	t_router *route = routesHash + 4; // sha512
 	size_t	lenPass = ft_strlen(password);
 	char	*concat = malloc(lenPass + 8*8 + 4 + 1);
 	unsigned index = 1;

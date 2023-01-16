@@ -31,6 +31,18 @@ typedef void (*t_encodeBloc)(t_hash *hash, void *message);
 typedef void (*t_padding)(unsigned char *message, size_t full_len, t_hash *hash);
 typedef void (*t_printHash)(t_hash *hash);
 
+typedef struct		s_des
+{
+	int				fdInput;
+	int				fdOutput;
+	unsigned long	key;
+	unsigned long	iv;
+	int				isDecode;
+	int				isBase64;
+}					t_des;
+
+typedef unsigned long (*t_encodeDES)(t_des *des, unsigned long data, unsigned long *keys);
+
 typedef struct		s_router
 {
 	char			name[10];
@@ -42,15 +54,12 @@ typedef struct		s_router
 	t_printHash		printHash;
 }					t_router;
 
-typedef struct		s_des
+typedef struct		s_router_des
 {
-	int				fdInput;
-	int				fdOutput;
-	unsigned long	key;
-	unsigned long	iv;
-	int				isDecode;
-	int				isBase64;
-}					t_des;
+	char			name[10];
+	t_encodeDES		encode;
+	t_encodeDES 	decode;
+}					t_router_des;
 
 // md5
 void md5InitHash(t_hash *hash);
@@ -88,39 +97,37 @@ size_t	base64DecodeRC(unsigned char *message, size_t size, char *output);
 void	generateKey(unsigned long key, unsigned long *keys);
 unsigned long desEncrypt(unsigned long bloc, unsigned long *keys);
 size_t	desPadding(void *d, size_t size);
+void	routerDES(char **argv, t_router_des *route);
 
 // DES-ECB
-void desECB_Router(char **argv);
-void optionsDesECB(char **argv, t_optpars *optpars, t_des *desO);
+unsigned long encode_decodeECB(t_des *des, unsigned long data, unsigned long *keys);
 
-unsigned long keyToLong(char *key, char *name);
-void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg);
-void revTabLong(unsigned long *tab, int size);
 
 // DES-CBC
-void	desCBC_Router(char **argv);
+unsigned long decodeCBC(t_des *des, unsigned long data, unsigned long *keys);
+unsigned long encodeCBC(t_des *des, unsigned long data, unsigned long *keys);
 
 // router
-t_router	*getRouter(char *name);
-void router(char **argv, t_router *router);
-void getArg(char *message, size_t len, t_hash *hash, t_router *route);
+int		getRouter(char **argv, char *name);
+void	routerHash(char **argv, t_router *router);
+void	getArg(char *message, size_t len, t_hash *hash, t_router *route);
 
 // PBKDF2
-void pbkdf2(char *password, unsigned long salt, t_hash *hash);
+void	pbkdf2(char *password, unsigned long salt, t_hash *hash);
 
 // Print
-void print_bits(void *str, size_t len);
-void print_dbits(char *name, void *str, size_t len);
+void	print_bits(void *str, size_t len);
+void	print_dbits(char *name, void *str, size_t len);
 
 
-void options(char **argv, char **message, t_optpars *ret);
+void	options(char **argv, char **message, t_optpars *ret);
 unsigned int swap32(unsigned int num);
-size_t swap64(size_t val);
-unsigned int leftRotate(unsigned int n, unsigned int d);
-unsigned int rightRotate(unsigned int n, unsigned int d);
-unsigned int rightShift(unsigned int n, unsigned int d);
-unsigned long rightRotate64(unsigned long n, unsigned long d);
-ssize_t turboRead(int fd, void *data, size_t sizeBloc, int isDelWhite);
+size_t	swap64(size_t val);
+unsigned int	leftRotate(unsigned int n, unsigned int d);
+unsigned int	rightRotate(unsigned int n, unsigned int d);
+unsigned int	rightShift(unsigned int n, unsigned int d);
+unsigned long	rightRotate64(unsigned long n, unsigned long d);
+ssize_t	turboRead(int fd, void *data, size_t sizeBloc, int isDelWhite);
 void	turboNShift(void *n, int size);
 unsigned long	atoi_hex(char *str);
 int		isHex(char *str);
