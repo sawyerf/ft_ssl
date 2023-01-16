@@ -32,17 +32,20 @@ void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg
 		} else {
 			salt = keyToLong(saltArg, "Salt");
 		}
-		if (!passArg) {
+		if (passArg) {
+			pbkdf2(passArg, salt, &hash);
+		} else if (keyArg) {
+			pbkdf2("", salt, &hash);
+		} else {
 			passArg = getpass("Password: ");
 			pbkdf2(passArg, salt, &hash);
 			free(passArg);
-		} else {
-			pbkdf2(passArg, salt, &hash);
 		}
-		desO->key = hash.HH0;
-		desO->iv = hash.HH1;
-		ft_printf("salt=%016lx\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
+		if (keyArg) desO->key = hash.HH0;
+		if (ivArg)  desO->iv = hash.HH1;
+		ft_dprintf(2, "salt=%016lx\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
 	}
+	desO->iv = swap64(desO->iv);
 }
 
 void optionsDesECB(char **argv, t_optpars *optpars, t_des *desO) {
@@ -97,8 +100,6 @@ void revTabLong(unsigned long *tab, int size) {
 		tab[size - 1 - index] = tmp;
 	}
 }
-
-#define DES_SIZE_READ 3 * 4
 
 void desECB_Router(char **argv) {
 	t_des	desO;

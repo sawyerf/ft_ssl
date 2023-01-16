@@ -3,6 +3,8 @@
 
 # include "libft.h"
 
+#define DES_SIZE_READ 3 * 4
+
 typedef struct		s_hash
 {
 	unsigned int	H0;
@@ -90,6 +92,13 @@ size_t	desPadding(void *d, size_t size);
 // DES-ECB
 void desECB_Router(char **argv);
 void optionsDesECB(char **argv, t_optpars *optpars, t_des *desO);
+
+unsigned long keyToLong(char *key, char *name);
+void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg);
+void revTabLong(unsigned long *tab, int size);
+
+// DES-CBC
+void	desCBC_Router(char **argv);
 
 // router
 t_router	*getRouter(char *name);

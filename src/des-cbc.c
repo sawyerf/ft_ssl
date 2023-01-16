@@ -1,19 +1,7 @@
 #include "libft.h"
 #include "ft_ssl.h"
 
-void revTabLong(unsigned long *tab, int size) {
-	unsigned long tmp;
-
-	for (int index = 0; index < size / 2; index++) {
-		tmp = tab[index];
-		tab[index] = tab[size - 1 - index];
-		tab[size - 1 - index] = tmp;
-	}
-}
-
-#define DES_SIZE_READ 3 * 4
-
-void desECB_Router(char **argv) {
+void desCBC_Router(char **argv) {
 	t_des	desO;
 	t_optpars opt;
 	unsigned long keys[16], data[DES_SIZE_READ], cipherText[DES_SIZE_READ];
@@ -47,10 +35,12 @@ void desECB_Router(char **argv) {
 		for (index = 0; index < prevLen / 8; index++) {
 			if (desO.isDecode) {
 				cipherText[index] = desEncrypt(data[index], keys);
+				cipherText[index] ^= desO.iv;
+				desO.iv = swap64(data[index]);
 			} else {
 				data[index] ^= desO.iv;
 				cipherText[index] = desEncrypt(data[index], keys);
-				desO.iv = cipherText[index];
+				desO.iv = swap64(cipherText[index]);
 			}
 		}
 		if (len != 8 * DES_SIZE_READ) break;

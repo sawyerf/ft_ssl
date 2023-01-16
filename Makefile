@@ -12,6 +12,7 @@ SRC_FILE =	main.c \
 			utils.c \
 			des.c \
 			des-ecb.c \
+			des-cbc.c \
 			md5.c \
 			sha224.c \
 			sha384.c \
