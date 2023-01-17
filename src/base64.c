@@ -128,7 +128,7 @@ void	base64Decode(unsigned char *message, size_t size, int fd) {
 	}
 }
 
-void	base64Router(char **argv) {
+void	routerBase64(char **argv) {
 	char *input = NULL, *output = NULL;
 	t_optpars	opt;
 	char	data[120];

@@ -7,7 +7,7 @@ unsigned long indexCTR = 0;
 unsigned long decodeCTR(t_des *des, unsigned long cipherText, unsigned long *keys) {
 	unsigned long plainText;
 
-	plainText = desEncrypt(indexCTR, keys);
+	plainText = desEncrypt(indexCTR ^ des->iv, keys);
 	plainText ^= cipherText;
 	indexCTR++;
 	return (plainText);
@@ -16,7 +16,7 @@ unsigned long decodeCTR(t_des *des, unsigned long cipherText, unsigned long *key
 unsigned long encodeCTR(t_des *des, unsigned long plainText, unsigned long *keys) {
 	unsigned long cipherText;
 
-	cipherText = desEncrypt(indexCTR, keys);
+	cipherText = desEncrypt(indexCTR ^ des->iv, keys);
 	cipherText ^= plainText;
 	indexCTR++;
 	return (cipherText);

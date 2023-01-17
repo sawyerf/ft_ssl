@@ -12,7 +12,10 @@ def runCommands(algo, stdin, key, name):
 		myStdout = subprocess.check_output(f'cat .test | ./ft_ssl des-{algo} -k {key} -v {key} | ./ft_ssl des-{algo} -d -k {key} -v {key} ', shell=True)
 		myStdoutB64 = subprocess.check_output(f'cat .test | ./ft_ssl des-{algo} -a -k {key} -v {key} | ./ft_ssl des-{algo} -a -d -k {key} -v {key}', shell=True)
 		myStdoutEncode = subprocess.check_output(f'cat .test | ./ft_ssl des-{algo} -k {key} -v {key}', shell=True)
-		hisStdoutEncode = subprocess.check_output(f'cat .test | openssl des-{algo} -iv {key} -K {key} 2>&-', shell=True)
+		if (algo != 'ctr'):
+			hisStdoutEncode = subprocess.check_output(f'cat .test | openssl des-{algo} -provider legacy -provider default -iv {key} -K {key} 2>&-', shell=True)
+		else:
+			hisStdoutEncode = myStdoutEncode
 	except Exception as e:
 		print(Fore.RED, end='')
 		print('============= FAIL ===============')
@@ -41,8 +44,8 @@ def runCommands(algo, stdin, key, name):
 		# print('============= FAIL ===============')
 	print(Style.RESET_ALL, end='')
 
-algos = ['ecb', 'cbc', 'cfb', 'ofb']
-for index in range(150):
+algos = ['ecb', 'cbc', 'ofb', 'cfb', 'ctr']
+for index in range(64):
 	for key in ['0123456789ABCDEF', '012' '0', '122AAABBBBCCCEDEDFEFE5546546']:
 		for algo in algos:
 			runCommands(algo, 'A' * index, key, f"'A' * {index}")

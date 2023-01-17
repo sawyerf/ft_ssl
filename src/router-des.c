@@ -113,13 +113,13 @@ void routerDES(char **argv, t_router_des *route) {
 	optionsDes(argv, &opt, &desO);
 
 	generateKey(desO.key, keys);
-	if (desO.isDecode) {
+	if (desO.isDecode && route->isPadding) {
 		revTabLong(keys, 16);
 	}
 	while ((len = turboRead(desO.fdInput, data, 8 * DES_SIZE_READ, desO.isDecode & desO.isBase64)) >= 0) {
 		int index;
 
-		if (desO.isDecode && !len && prevLen) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
+		if (desO.isDecode && !len && prevLen && route->isPadding) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
 		if (!desO.isDecode && desO.isBase64) {
 			base64Encode((char *)cipherText, prevLen, desO.fdOutput);
 		} else {
@@ -127,12 +127,12 @@ void routerDES(char **argv, t_router_des *route) {
 		}
 
 		prevLen = len;
-		if (!desO.isDecode && len != 8 * DES_SIZE_READ) {
+		if (!desO.isDecode && len != 8 * DES_SIZE_READ && route->isPadding) {
 			prevLen = desPadding(data, len);
 		}
 		
 		if (desO.isDecode && desO.isBase64) prevLen = base64DecodeRC((unsigned char *)data, len, (unsigned char *)data);
-		for (index = 0; index < prevLen / 8; index++) {
+		for (index = 0; index < (prevLen + (8 - (prevLen % 8)) % 8) / 8; index++) {
 			if (desO.isDecode) {
 				cipherText[index] = route->decode(&desO, data[index], keys);
 			} else {
@@ -142,11 +142,11 @@ void routerDES(char **argv, t_router_des *route) {
 		if (len != 8 * DES_SIZE_READ) break;
 	}
 	unsigned char padding = ((unsigned char*)cipherText)[prevLen - 1];
-	if (desO.isDecode && prevLen && (padding > 8 || padding > prevLen | !padding)) {
+	if (desO.isDecode && prevLen && (padding > 8 || padding > prevLen | !padding) && route->isPadding) {
 		ft_dprintf(2, "Wrong padding\n", prevLen, padding, padding);
 		exit(1);
 	}
-	if (desO.isDecode && prevLen && (((unsigned char*)cipherText)[prevLen - 1] <= len)) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
+	if (desO.isDecode && prevLen && (((unsigned char*)cipherText)[prevLen - 1] <= len) && route->isPadding) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
 	if (!desO.isDecode && desO.isBase64) {
 		base64Encode((char *)cipherText, prevLen, desO.fdOutput);
 	} else {

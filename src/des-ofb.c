@@ -6,7 +6,7 @@ unsigned long decodeOFB(t_des *des, unsigned long cipherText, unsigned long *key
 	unsigned long plainText;
 
 	plainText = desEncrypt(des->iv, keys);
-	des->iv = cipherText;
+	des->iv = plainText;
 	plainText ^= cipherText;
 	return (plainText);
 }

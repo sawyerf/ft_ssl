@@ -10,12 +10,12 @@ t_router routesHash[] = {
 };
 
 t_router_des routesDES[] = {
-	{"des", &encodeCBC, &decodeCBC},
-	{"des-cbc", &encodeCBC, &decodeCBC},
-	{"des-cfb", &encodeCFB, &decodeCFB},
-	{"des-ctr", &encodeCTR, &decodeCTR},
-	{"des-ecb", &encode_decodeECB, &encode_decodeECB},
-	{"des-ofb", &encodeOFB, &decodeOFB}
+	{"des", &encodeCBC, &decodeCBC, 1},
+	{"des-cbc", &encodeCBC, &decodeCBC, 1},
+	{"des-cfb", &encodeCFB, &decodeCFB, 0},
+	{"des-ctr", &encodeCTR, &decodeCTR, 0},
+	{"des-ecb", &encode_decodeECB, &encode_decodeECB, 1},
+	{"des-ofb", &encodeOFB, &encodeOFB, 0}
 };
 
 int	getRouter(char **argv, char *name) {
@@ -30,6 +30,10 @@ int	getRouter(char **argv, char *name) {
 			routerDES(argv + 2, &routesDES[index]);
 			return (1);
 		}
+	}
+	if (!ft_strcmp(name, "base64")) {
+		routerBase64(argv + 2);
+		return (1);
 	}
 	return (0);
 }
