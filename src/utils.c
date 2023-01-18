@@ -80,11 +80,15 @@ size_t delWhiteSpace(char *str, size_t size) {
 	int index = 0;
 
 	for (; index + decal < size; index++) {
-		while (str[index + decal] == ' ' || str[index + decal] == '\r' || str[index + decal] == '\t' || str[index + decal] == '\n') {
+		while ((str[index + decal] == ' ' || str[index + decal] == '\r' || 
+			str[index + decal] == '\t' || str[index + decal] == '\n' ||
+			str[index + decal] == '\r' || str[index + decal] == 0) && index + decal < size) {
 			decal++;
 		}
+		// ft_printf("%d, %d, %d\n", index, decal, size);
 		str[index] = str[index + decal];
 	}
+	if (index + decal > size) return index - 1;
 	return index;
 }
 
