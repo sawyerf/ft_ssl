@@ -12,9 +12,9 @@ void pbkdf2(char *password, unsigned long salt, t_hash *hash) {
 	ft_memcpy(concat, &salt, 8);
 	ft_memcpy(concat + 8, &index, 4);
 	ft_strcpy(concat + 8 + 4, password);
-	getArg(concat, lenPass + 3, hash, route);
+	getArg(concat, lenPass + 8 + 4, hash, route);
 
-	ft_strcpy(concat + 8*8 + 4, password);
+	ft_strcpy(concat + 8*8 + 8, password);
 	for (index = 2; index <= 1000; index++) {
 		ft_memcpy(concat, &hash->H0, 8*8);
 		ft_memcpy(concat + 8*8, &index, 4);

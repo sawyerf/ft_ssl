@@ -169,7 +169,7 @@ size_t	desPadding(void *d, size_t size) {
 	char *data = (char*)d;
 	unsigned int pad = 8 - (size % 8);
 
-	for (int i = 0; i < pad; i++) {
+	for (unsigned int i = 0; i < pad; i++) {
 		// ft_printf("%d %d\n", size + i, pad);
 		data[size + i] = pad;
 	}

@@ -13,7 +13,7 @@ void print_bits(void *str, size_t len) {
 	if (!isDebug) return ;
 	for (size_t i = 0; i < len; i++) {
 		if (!(i % 8)) ft_printf("\n");
-		// print_bit(((unsigned char *)str)[i]);
+		print_bit(((unsigned char *)str)[i]);
 	}
 	ft_printf("\n");
 }
@@ -76,8 +76,8 @@ unsigned int rightShift(unsigned int n, unsigned int d) {
 }
 
 size_t delWhiteSpace(char *str, size_t size) {
-	int decal = 0;
-	int index = 0;
+	size_t decal = 0;
+	size_t index = 0;
 
 	for (; index + decal < size; index++) {
 		while ((str[index + decal] == ' ' || str[index + decal] == '\r' || 
@@ -93,7 +93,6 @@ size_t delWhiteSpace(char *str, size_t size) {
 }
 
 ssize_t turboRead(int fd, void *data, size_t sizeBloc, int isDelWhite) {
-	unsigned char buffer[128];
 	ssize_t len;
 	size_t size = 0;
 
@@ -149,9 +148,9 @@ int		isHex(char *str) {
 	int len = ft_strlen(str);
 
 	for (int i = 0; i < len; i++) {
-		if (!(str[i] >= '0' && str[i] <= '9' ||
-			str[i] >= 'a' && str[i] <= 'f' ||
-			str[i] >= 'A' && str[i] <= 'F'))
+		if (!((str[i] >= '0' && str[i] <= '9') ||
+			(str[i] >= 'a' && str[i] <= 'f') ||
+			(str[i] >= 'A' && str[i] <= 'F')))
 			return (0);
 	}
 	return (1);

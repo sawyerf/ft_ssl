@@ -15,7 +15,7 @@ unsigned long keyToLong(char *key, char *name) {
 	ft_memset(keyStr, '0', 16);
 	ft_memcpy(keyStr, key, ft_strlen(key) <= 16 ? ft_strlen(key) : 16);
 	keyStr[16] = 0;
-	atoi_hex(keyStr);
+	return atoi_hex(keyStr);
 }
 
 void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg) {
@@ -23,7 +23,6 @@ void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg
 	if (ivArg)  desO->iv = keyToLong(ivArg, "IV");
 	if (!keyArg || !ivArg) {
 		t_hash hash;
-		char saltStr[17];
 		unsigned long salt;
 
 		if (!saltArg) {
@@ -121,7 +120,7 @@ void routerDES(char **argv, t_router_des *route) {
 
 		if (desO.isDecode && !len && prevLen && route->isPadding) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
 		if (!desO.isDecode && desO.isBase64) {
-			base64Encode((char *)cipherText, prevLen, desO.fdOutput);
+			base64Encode((unsigned char *)cipherText, prevLen, desO.fdOutput);
 		} else {
 			write(desO.fdOutput, cipherText, prevLen);
 		}
@@ -131,7 +130,7 @@ void routerDES(char **argv, t_router_des *route) {
 			prevLen = desPadding(data, len);
 		}
 		
-		if (desO.isDecode && desO.isBase64) prevLen = base64Decode((unsigned char *)data, len, (unsigned char *)data);
+		if (desO.isDecode && desO.isBase64) prevLen = base64Decode((unsigned char *)data, len, (char *)data);
 		for (index = 0; index < (prevLen + (8 - (prevLen % 8)) % 8) / 8; index++) {
 			if (desO.isDecode) {
 				cipherText[index] = route->decode(&desO, data[index], keys);
@@ -142,13 +141,13 @@ void routerDES(char **argv, t_router_des *route) {
 		if (len != 8 * DES_SIZE_READ) break;
 	}
 	unsigned char padding = ((unsigned char*)cipherText)[prevLen - 1];
-	if (desO.isDecode && prevLen && (padding > 8 || padding > prevLen | !padding) && route->isPadding) {
+	if (desO.isDecode && prevLen && (padding > 8 || (ssize_t)padding > (prevLen | !padding)) && route->isPadding) {
 		ft_dprintf(2, "Wrong padding\n", prevLen, padding, padding);
 		exit(1);
 	}
 	if (desO.isDecode && prevLen && (((unsigned char*)cipherText)[prevLen - 1] <= len) && route->isPadding) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
 	if (!desO.isDecode && desO.isBase64) {
-		base64Encode((char *)cipherText, prevLen, desO.fdOutput);
+		base64Encode((unsigned char *)cipherText, prevLen, desO.fdOutput);
 	} else {
 		write(desO.fdOutput, cipherText, prevLen);
 	}

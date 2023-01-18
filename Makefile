@@ -27,7 +27,7 @@ SRC_FILE =	main.c \
 			router-get.c \
 			pbkdf2.c \
 
-CFLAGS =	-I $(INC_DIR) -I libft/inc/ -g # -Wall -Werror -Wextra
+CFLAGS =	-I $(INC_DIR) -I libft/inc/ -g -Wall -Werror -Wextra
 
 OBJ_DIR =	.obj
 OBJ_FILE =	$(SRC_FILE:.c=.o)

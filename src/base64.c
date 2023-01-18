@@ -26,7 +26,7 @@ void optionsBase64(char **argv, char **input, char **output, t_optpars *optpars)
 	isDebug = ft_tabfind(optpars->opt, "-v") > 0;
 }
 
-char	getBase64(char index) {
+char	getBase64(unsigned char index) {
 	return base64[index];
 }
 
@@ -43,7 +43,7 @@ unsigned char	getIndex(char car) {
 }
 
 unsigned int	turboShift(unsigned int n) {
-	char *tmp = (unsigned char*)&n;
+	unsigned char *tmp = (unsigned char*)&n;
 
 	tmp[0] = tmp[0] << 6;
 	tmp[0] |= (tmp[1] >> 2) & 0x3F;
@@ -78,7 +78,7 @@ void	base64Encode(unsigned char *message, size_t size, int fd) {
 	}
 	if (size % 3) {
 		base64EncodeBloc(message + index, size % 3, fd);
-		for (int i = 0; i < (3 - size % 3); i++) {
+		for (unsigned int i = 0; i < (3 - size % 3); i++) {
 			ft_dprintf(fd, "=");
 		}
 	}
@@ -120,7 +120,7 @@ size_t	base64Decode(unsigned char *message, size_t size, char *output) {
 void	routerBase64(char **argv) {
 	char *input = NULL, *output = NULL;
 	t_optpars	opt;
-	char	data[120];
+	unsigned char	data[120];
 	ssize_t len;
 	size_t nlen;
 	int fdi = 0, fdo = 1;
@@ -144,7 +144,7 @@ void	routerBase64(char **argv) {
 				ft_dprintf(2, "Base64: invalid input 3\n");
 				exit(1);
 			}
-			nlen = base64Decode(data, len, data);
+			nlen = base64Decode(data, len, (char*)data);
 			write(fdo, data, nlen);
 		} else {
 			base64Encode(data, len, fdo);
