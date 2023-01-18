@@ -37,9 +37,9 @@ unsigned char	getIndex(char car) {
 			return (index);
 		}
 	}
-	ft_dprintf(2, "Error: Decoding base64\n");
+	if (car == '=') return (0);
+	ft_dprintf(2, "Base64: invalid input 1\n");
 	exit(1);
-	return 0;
 }
 
 unsigned int	turboShift(unsigned int n) {
@@ -97,35 +97,24 @@ void	compressBase64(char *str) {
 	str[3] = 0;
 }
 
-size_t	base64DecodeRC(unsigned char *message, size_t size, char *output) {
+size_t	base64Decode(unsigned char *message, size_t size, char *output) {
 	unsigned int index = 0, indexO = 0;
+	int isEnd = 0;
 
 	for (; index < (unsigned int)size - size % 4; index += 4) {
 		int i = 0;
 		for (; i < 4; i++) {
-			if (message[index + i] == '=') {
-				break;
+			if (isEnd == 2 || (isEnd > 0 && message[index + i] != '=')) {
+				ft_dprintf(2, "Base64: invalid input 2\n");
+				exit(1);
 			}
+			if (message[index + i] == '=') isEnd++;
 			output[indexO + i] = getIndex(message[index + i]);
 		}
 		compressBase64(output + indexO);
-		indexO += i - 1;
+		indexO += i - 1 - isEnd;
 	}
 	return indexO;
-}
-
-void	base64Decode(unsigned char *message, size_t size, int fd) {
-	unsigned int index = 0;
-	unsigned char tmp[4];
-
-	for (; index < (unsigned int)size - size % 4; index += 4) {
-		bzero(tmp, 4);
-		for (int i = 0; i < 4; i++) {
-			tmp[i] = getIndex(message[index + i]);
-		}
-		compressBase64(tmp);
-		write(fd, tmp, 3);
-	}
 }
 
 void	routerBase64(char **argv) {
@@ -133,6 +122,7 @@ void	routerBase64(char **argv) {
 	t_optpars	opt;
 	char	data[120];
 	ssize_t len;
+	size_t nlen;
 	int fdi = 0, fdo = 1;
 
 	optionsBase64(argv, &input, &output, &opt);
@@ -150,13 +140,18 @@ void	routerBase64(char **argv) {
 	}
 	while ((len = turboRead(fdi, data, 120, ft_tabfind(opt.opt, "-d"))) > 0) {
 		if (ft_tabfind(opt.opt, "-d")) {
-			base64Decode(data, len, fdo);
+			if (len % 4) {
+				ft_dprintf(2, "Base64: invalid input 3\n");
+				exit(1);
+			}
+			nlen = base64Decode(data, len, data);
+			write(fdo, data, nlen);
 		} else {
 			base64Encode(data, len, fdo);
 		}
 		if (len != 120) return ;
 	}
-	ft_dprintf(fdo, "\n");
+	// ft_dprintf(fdo, "\n");
 	close(fdi);
 	close(fdo);
 }

@@ -91,8 +91,7 @@ void sha512PrintHash(t_hash *hash);
 // Base64
 void	routerBase64(char **argv);
 void	base64Encode(unsigned char *message, size_t size, int fd);
-void	base64Decode(unsigned char *message, size_t size, int fd);
-size_t	base64DecodeRC(unsigned char *message, size_t size, char *output);
+size_t	base64Decode(unsigned char *message, size_t size, char *output);
 
 // DES
 void	generateKey(unsigned long key, unsigned long *keys);
@@ -100,6 +99,7 @@ unsigned long desEncrypt(unsigned long bloc, unsigned long *keys);
 size_t	desPadding(void *d, size_t size);
 void	routerDES(char **argv, t_router_des *route);
 
+unsigned long encode_decode3ECB(t_des *des, unsigned long data, unsigned long *keys);
 // DES-ECB
 unsigned long encode_decodeECB(t_des *des, unsigned long data, unsigned long *keys);
 

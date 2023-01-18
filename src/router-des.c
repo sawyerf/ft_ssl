@@ -131,7 +131,7 @@ void routerDES(char **argv, t_router_des *route) {
 			prevLen = desPadding(data, len);
 		}
 		
-		if (desO.isDecode && desO.isBase64) prevLen = base64DecodeRC((unsigned char *)data, len, (unsigned char *)data);
+		if (desO.isDecode && desO.isBase64) prevLen = base64Decode((unsigned char *)data, len, (unsigned char *)data);
 		for (index = 0; index < (prevLen + (8 - (prevLen % 8)) % 8) / 8; index++) {
 			if (desO.isDecode) {
 				cipherText[index] = route->decode(&desO, data[index], keys);

@@ -15,6 +15,7 @@ t_router_des routesDES[] = {
 	{"des-cfb", &encodeCFB, &decodeCFB, 0},
 	{"des-ctr", &encodeCTR, &decodeCTR, 0},
 	{"des-ecb", &encode_decodeECB, &encode_decodeECB, 1},
+	{"des3-ecb", &encode_decode3ECB, &encode_decode3ECB, 1},
 	{"des-ofb", &encodeOFB, &encodeOFB, 0}
 };
 
@@ -25,7 +26,7 @@ int	getRouter(char **argv, char *name) {
 			return (1);
 		}
 	}
-	for (int index = 0; index < 6; index++) {
+	for (int index = 0; index < 7; index++) {
 		if (!ft_strcmp(routesDES[index].name, name)) {
 			routerDES(argv + 2, &routesDES[index]);
 			return (1);
