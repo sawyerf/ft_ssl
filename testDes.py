@@ -45,7 +45,7 @@ def runCommands(algo, stdin, key, name):
 	print(Style.RESET_ALL, end='')
 
 algos = ['ecb', 'cbc', 'ofb', 'cfb', 'ctr']
-for index in range(64):
+for index in range(324):
 	for key in ['0123456789ABCDEF', '012' '0', '122AAABBBBCCCEDEDFEFE5546546']:
 		for algo in algos:
 			runCommands(algo, 'A' * index, key, f"'A' * {index}")
