@@ -4,6 +4,7 @@
 # include "libft.h"
 
 #define DES_SIZE_READ 3 * 4
+#define HASH32_SIZE 8 * 4
 
 typedef struct		s_hash
 {
@@ -123,6 +124,9 @@ unsigned long encodeCTR(t_des *des, unsigned long data, unsigned long *keys);
 int		getRouter(char **argv, char *name);
 void	routerHash(char **argv, t_router *router);
 void	getArg(char *message, size_t len, t_hash *hash, t_router *route);
+
+// HMAC
+void	hmacSha256(t_hash *hash, char *key, size_t lenKey, char *message, size_t lenMes);
 
 // PBKDF2
 void	pbkdf2(char *password, unsigned long salt, t_hash *hash);

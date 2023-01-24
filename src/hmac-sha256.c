@@ -1,40 +1,43 @@
 #include "ft_ssl.h"
 
-void	hmacPad(char *key, size_t len, char c) {
-	t_hash	hash;
-
-}
-
 #define BLOC_SIZE 64
 
-void	hmacConcat(char *message, char *key, size_t lenMes, size_t lenKey, char c) {
-	t_hash hash;
+void	hmacConcat(t_hash *hash, char *key, size_t lenKey, char *message, size_t lenMes, char c) {
 	char	buffer[BLOC_SIZE];
-	// char *concat = ft_strnew(lenMes + 64);
-	size_t index = lenKey;
+	size_t index = 0;
 
-	// for (; index < 64)
-	// ft_memcpy(concat + lenMes, key, lenKey);
-	// ft_memcpy(concat, message, lenMes);
-	// getArg(concat, lenMes + lenKey, hash)
-	ft_memset(buffer, c, BLOC_SIZE);
-	for (; index < lenKey; index++)
-		buffer[index] = key[index] ^ c;
-	sha256InitHash(&hash);
-	sha256EncodeBloc(&hash, buffer);
+	ft_memset(buffer, 0, BLOC_SIZE);
+	ft_memcpy(buffer, key, lenKey);
+	for (; index < BLOC_SIZE; index++)
+		buffer[index] = buffer[index] ^ c;
 
+	sha256InitHash(hash);
+	// Hash Key
+	sha256EncodeBloc(hash, buffer);
+
+	// Hash message
 	index = 0;
-	while (len - index >= BLOC_SIZE) {
+	while (lenMes - index >= BLOC_SIZE) {
 		sha256EncodeBloc(hash, message);
 		message += BLOC_SIZE;
 		index += BLOC_SIZE;
 	}
 	ft_bzero(buffer, BLOC_SIZE);
-	ft_memcpy(buffer, message, len - index);
-	sha256Padding(buffer, len + BLOC_SIZE, &hash);
-	sha256PrintHash(&hash)
+	ft_memcpy(buffer, message, lenMes - index);
+	sha256Padding((void*)buffer, lenMes + BLOC_SIZE, hash);
 }
 
-void	hmacSha256(t_hash *hash, char *key, char *message) {
+void	swap32cpy(unsigned int *dst, unsigned int *src) {
+	for (int index = 0; index < 8; index++) {
+		dst[index] = swap32(src[index]);
+	}
+}
+
+void	hmacSha256(t_hash *hash, char *key, size_t lenKey, char *message, size_t lenMes) {
+	unsigned int buffer[8];
+
 	
+	hmacConcat(hash, key, lenKey, message, lenMes, 0x36);
+	swap32cpy(buffer, (void*)hash);
+	hmacConcat(hash, key, lenKey, (void*)buffer, HASH32_SIZE, 0x5c);
 }

@@ -40,8 +40,8 @@ void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg
 			pbkdf2(passArg, salt, &hash);
 			free(passArg);
 		}
-		if (!keyArg) desO->key = hash.HH0;
-		if (!ivArg)  desO->iv = hash.HH1;
+		if (!keyArg) desO->key = (unsigned long)hash.H0 << 32 | hash.H1;
+		if (!ivArg)  desO->iv = (unsigned long)hash.H2 << 32 | hash.H3;
 		ft_dprintf(2, "salt=%016lx\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
 	}
 	desO->iv = swap64(desO->iv);

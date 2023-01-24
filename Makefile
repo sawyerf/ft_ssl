@@ -15,6 +15,7 @@ SRC_FILE =	main.c \
 			des-cfb.c \
 			des-ctr.c \
 			des-ecb.c \
+			hmac-sha256.c \
 			des-ofb.c \
 			md5.c \
 			sha224.c \
