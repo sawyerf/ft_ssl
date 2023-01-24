@@ -40,4 +40,5 @@ void	hmacSha256(t_hash *hash, char *key, size_t lenKey, char *message, size_t le
 	hmacConcat(hash, key, lenKey, message, lenMes, 0x36);
 	swap32cpy(buffer, (void*)hash);
 	hmacConcat(hash, key, lenKey, (void*)buffer, HASH32_SIZE, 0x5c);
+	swap32cpy((void*)hash, (void*)hash);
 }

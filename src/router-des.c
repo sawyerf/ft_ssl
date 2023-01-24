@@ -40,11 +40,13 @@ void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg
 			pbkdf2(passArg, salt, &hash);
 			free(passArg);
 		}
-		if (!keyArg) desO->key = (unsigned long)hash.H0 << 32 | hash.H1;
-		if (!ivArg)  desO->iv = (unsigned long)hash.H2 << 32 | hash.H3;
-		ft_dprintf(2, "salt=%016lx\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
+		if (!keyArg) ft_memcpy(&desO->key, &hash.H0, 2 * 4);
+		if (!ivArg)  ft_memcpy(&desO->iv, &hash.H2, 2 * 4);
+		desO->key = swap64(desO->key);
+		desO->iv  = swap64(desO->iv);
 	}
-	desO->iv = swap64(desO->iv);
+	// desO->iv = swap64(desO->iv);
+	ft_dprintf(2, "salt=\nkey=%016lX\niv=%016lX\n", desO->key, desO->iv);
 }
 
 void optionsDes(char **argv, t_optpars *optpars, t_des *desO) {
