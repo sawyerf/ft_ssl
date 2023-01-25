@@ -5,6 +5,24 @@
 #include <unistd.h>
 #include <time.h>
 
+typedef struct	s_read {
+	// unsigned long data[DES_SIZE_READ];
+	unsigned long cipherText[DES_SIZE_READ];
+	ssize_t prevLen;
+}				t_read;
+
+t_read g_read;
+
+void revTabLong(unsigned long *tab, int size) {
+	unsigned long tmp;
+
+	for (int index = 0; index < size / 2; index++) {
+		tmp = tab[index];
+		tab[index] = tab[size - 1 - index];
+		tab[size - 1 - index] = tmp;
+	}
+}
+
 unsigned long keyToLong(char *key, char *name) {
 	char keyStr[17];
 
@@ -18,39 +36,76 @@ unsigned long keyToLong(char *key, char *name) {
 	return atoi_hex(keyStr);
 }
 
-void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg) {
+void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg) {
 	unsigned long salt;
+	int isLol = 0;
+	unsigned long data[DES_SIZE_READ];
 
 	if (keyArg) desO->key = keyToLong(keyArg, "Key");
 	if (ivArg)  desO->iv = keyToLong(ivArg, "IV");
 	if (!keyArg || !ivArg) {
 		t_hash hash;
 
-		if (!saltArg) {
+		if (!passArg && !keyArg) {
+			passArg = getpass("Password: ");
+		}
+		if (!saltArg && desO->isDecode) {
+			ft_bzero(data, 8 * DES_SIZE_READ);
+			isLol = 1;
+
+			int len = turboRead(desO->fdInput, data, 32, desO->isDecode & desO->isBase64);
+			g_read.prevLen = len;
+			if (desO->isBase64) g_read.prevLen = base64Decode((unsigned char *)data, len, (char *)data);
+			if (g_read.prevLen >= 16 && !ft_strncmp("Salted__", (void*)data, 8)) {
+				salt = swap64(data[1]);
+				g_read.prevLen -= 16;
+				ft_memcpy(data, data + 2, g_read.prevLen);
+			} else {
+				ft_dprintf(2, "Error: Need Salt");
+				exit(1);
+			}
+		} else if (!saltArg) {
 			srandom(time(NULL));
-			salt = random() | random() << 32;
+			salt = swap64(random() | random() << 32);
+			write(desO->fdOutput, "Salted__", 8);
+			write(desO->fdOutput, &salt, 8);
+			salt = swap64(salt);
 		} else {
 			salt = keyToLong(saltArg, "Salt");
 		}
 		if (passArg) {
 			pbkdf2(passArg, salt, &hash, 1000);
-		} else if (keyArg) {
-			pbkdf2("", salt, &hash, 1000);
 		} else {
-			passArg = getpass("Password: ");
-			pbkdf2(passArg, salt, &hash, 1000);
-			free(passArg);
+			pbkdf2("", salt, &hash, 1000);
 		}
-		if (!keyArg) ft_memcpy(&desO->key, &hash.H0, 2 * 4);
-		if (!ivArg)  ft_memcpy(&desO->iv, &hash.H2, 2 * 4);
-		desO->key = swap64(desO->key);
-		// desO->iv  = swap64(desO->iv);
+		// } else {
+		// 	passArg = getpass("Password: ");
+		// 	pbkdf2(passArg, salt, &hash, 1000);
+		// 	free(passArg);
+		// }
+		if (!keyArg) {
+			ft_memcpy(&desO->key, &hash.H0, 2 * 4);
+			desO->key = swap64(desO->key);
+		}
+		if (!ivArg) {
+			ft_memcpy(&desO->iv, &hash.H2, 2 * 4);
+			desO->iv = swap64(desO->iv);
+		}
 	}
-	if (ivArg) desO->iv = swap64(desO->iv);
+	// if (ivArg) desO->iv = swap64(desO->iv);
 	ft_dprintf(2, "salt=%016lX\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
+	generateKey(desO->key, desO->keys);
+	if (desO->isDecode && route->isPadding) {
+		revTabLong(desO->keys, 16);
+	}
+	if (isLol) {
+		for (int index = 0; index < (g_read.prevLen + (8 - (g_read.prevLen % 8)) % 8) / 8; index++) {
+			g_read.cipherText[index] = route->decode(desO, data[index], desO->keys);
+		}
+	}
 }
 
-void optionsDes(char **argv, t_optpars *optpars, t_des *desO) {
+void optionsDes(char **argv, t_optpars *optpars, t_des *desO, t_router_des *route) {
 	t_opt	*opt;
 	unsigned char ret;
 	char	*input = NULL,
@@ -72,7 +127,6 @@ void optionsDes(char **argv, t_optpars *optpars, t_des *desO) {
 	if (ret)
 		exit(ret);
 
-	setKey(desO, desO->keyArg, desO->passArg, desO->saltArg, desO->ivArg);
 	desO->isBase64 = ft_tabfind(optpars->opt, "-a");
 	desO->isDecode = 1;
 	if (ft_tabfind(optpars->opt, "-e") || !ft_tabfind(optpars->opt, "-d")) {
@@ -87,74 +141,55 @@ void optionsDes(char **argv, t_optpars *optpars, t_des *desO) {
 		ft_dprintf(2, "ERROR: Can't open file `%s'\n", output);
 		exit(1);
 	}
-}
-
-void revTabLong(unsigned long *tab, int size) {
-	unsigned long tmp;
-
-	for (int index = 0; index < size / 2; index++) {
-		tmp = tab[index];
-		tab[index] = tab[size - 1 - index];
-		tab[size - 1 - index] = tmp;
-	}
+	setKey(route, desO, desO->keyArg, desO->passArg, desO->saltArg, desO->ivArg);
 }
 
 void routerDES(char **argv, t_router_des *route) {
 	t_des	desO;
 	t_optpars opt;
-	unsigned long keys[16], data[DES_SIZE_READ], cipherText[DES_SIZE_READ];
-	ssize_t len = 0, prevLen = 0;
-	// int isFirst = 1;
+	ssize_t len = 0;
+	unsigned long data[DES_SIZE_READ];
 
 	ft_bzero(&desO, sizeof(t_des));
-	ft_bzero(cipherText, DES_SIZE_READ * 8);
+	ft_bzero(&g_read, sizeof(t_read));
+	// ft_bzero(cipherText, DES_SIZE_READ * 8);
 
-	optionsDes(argv, &opt, &desO);
+	optionsDes(argv, &opt, &desO, route);
 
-	generateKey(desO.key, keys);
-	if (desO.isDecode && route->isPadding) {
-		revTabLong(keys, 16);
-	}
 	while ((len = turboRead(desO.fdInput, data, 8 * DES_SIZE_READ, desO.isDecode & desO.isBase64)) >= 0) {
 		int index;
 
-		if (desO.isDecode && !len && prevLen && route->isPadding) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
+		if (desO.isDecode && !len && g_read.prevLen && route->isPadding) g_read.prevLen -= ((unsigned char*)g_read.cipherText)[g_read.prevLen - 1];
 		if (!desO.isDecode && desO.isBase64) {
-			base64Encode((unsigned char *)cipherText, prevLen, desO.fdOutput);
+			base64Encode((unsigned char *)g_read.cipherText, g_read.prevLen, desO.fdOutput);
 		} else {
-			write(desO.fdOutput, cipherText, prevLen);
+			write(desO.fdOutput, g_read.cipherText, g_read.prevLen);
 		}
 
-		prevLen = len;
+		g_read.prevLen = len;
 		if (!desO.isDecode && len != 8 * DES_SIZE_READ && route->isPadding) {
-			prevLen = desPadding(data, len);
+			g_read.prevLen = desPadding(data, len);
 		}
 		
-		if (desO.isDecode && desO.isBase64) prevLen = base64Decode((unsigned char *)data, len, (char *)data);
-		// if (isFirst) {
-		// 	isFirst = 0;
-		// 	if (!ft_strcmp("Salted__", data)) {
-				
-		// 	}
-		// }
-		for (index = 0; index < (prevLen + (8 - (prevLen % 8)) % 8) / 8; index++) {
+		if (desO.isDecode && desO.isBase64) g_read.prevLen = base64Decode((unsigned char *)data, len, (char *)data);
+		for (index = 0; index < (g_read.prevLen + (8 - (g_read.prevLen % 8)) % 8) / 8; index++) {
 			if (desO.isDecode) {
-				cipherText[index] = route->decode(&desO, data[index], keys);
+				g_read.cipherText[index] = route->decode(&desO, data[index], desO.keys);
 			} else {
-				cipherText[index] = route->encode(&desO, data[index], keys);
+				g_read.cipherText[index] = route->encode(&desO, data[index], desO.keys);
 			}
 		}
 		if (len != 8 * DES_SIZE_READ) break;
 	}
-	unsigned char padding = ((unsigned char*)cipherText)[prevLen - 1];
-	if (desO.isDecode && prevLen && (padding > 8 || (ssize_t)padding > (prevLen | !padding)) && route->isPadding) {
-		ft_dprintf(2, "Wrong padding\n", prevLen, padding, padding);
+	unsigned char padding = ((unsigned char*)g_read.cipherText)[g_read.prevLen - 1];
+	if (desO.isDecode && g_read.prevLen && (padding > 8 || (ssize_t)padding > (g_read.prevLen | !padding)) && route->isPadding) {
+		ft_dprintf(2, "Wrong padding\n", g_read.prevLen, padding, padding);
 		exit(1);
 	}
-	if (desO.isDecode && prevLen && (((unsigned char*)cipherText)[prevLen - 1] <= len) && route->isPadding) prevLen -= ((unsigned char*)cipherText)[prevLen - 1];
+	if (desO.isDecode && g_read.prevLen && (((unsigned char*)g_read.cipherText)[g_read.prevLen - 1] <= len) && route->isPadding) g_read.prevLen -= ((unsigned char*)g_read.cipherText)[g_read.prevLen - 1];
 	if (!desO.isDecode && desO.isBase64) {
-		base64Encode((unsigned char *)cipherText, prevLen, desO.fdOutput);
+		base64Encode((unsigned char *)g_read.cipherText, g_read.prevLen, desO.fdOutput);
 	} else {
-		write(desO.fdOutput, cipherText, prevLen);
+		write(desO.fdOutput, g_read.cipherText, g_read.prevLen);
 	}
 }

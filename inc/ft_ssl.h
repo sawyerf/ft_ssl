@@ -44,6 +44,7 @@ typedef struct		s_des
 	char			*ivArg;
 	char			*passArg;
 	char			*saltArg;
+	unsigned long keys[16];
 }					t_des;
 
 typedef unsigned long (*t_encodeDES)(t_des *des, unsigned long data, unsigned long *keys);
