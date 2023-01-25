@@ -40,6 +40,10 @@ typedef struct		s_des
 	unsigned long	iv;
 	int				isDecode;
 	int				isBase64;
+	char			*keyArg;
+	char			*ivArg;
+	char			*passArg;
+	char			*saltArg;
 }					t_des;
 
 typedef unsigned long (*t_encodeDES)(t_des *des, unsigned long data, unsigned long *keys);
@@ -129,7 +133,7 @@ void	getArg(char *message, size_t len, t_hash *hash, t_router *route);
 void	hmacSha256(t_hash *hash, char *key, size_t lenKey, char *message, size_t lenMes);
 
 // PBKDF2
-void	pbkdf2(char *password, unsigned long salt, t_hash *hash);
+void	pbkdf2(char *password, unsigned long salt, t_hash *hash, unsigned int iter);
 
 // Print
 void	print_bits(void *str, size_t len);

@@ -19,11 +19,12 @@ unsigned long keyToLong(char *key, char *name) {
 }
 
 void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg) {
+	unsigned long salt;
+
 	if (keyArg) desO->key = keyToLong(keyArg, "Key");
 	if (ivArg)  desO->iv = keyToLong(ivArg, "IV");
 	if (!keyArg || !ivArg) {
 		t_hash hash;
-		unsigned long salt;
 
 		if (!saltArg) {
 			srandom(time(NULL));
@@ -32,50 +33,46 @@ void setKey(t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg
 			salt = keyToLong(saltArg, "Salt");
 		}
 		if (passArg) {
-			pbkdf2(passArg, salt, &hash);
+			pbkdf2(passArg, salt, &hash, 1000);
 		} else if (keyArg) {
-			pbkdf2("", salt, &hash);
+			pbkdf2("", salt, &hash, 1000);
 		} else {
 			passArg = getpass("Password: ");
-			pbkdf2(passArg, salt, &hash);
+			pbkdf2(passArg, salt, &hash, 1000);
 			free(passArg);
 		}
 		if (!keyArg) ft_memcpy(&desO->key, &hash.H0, 2 * 4);
 		if (!ivArg)  ft_memcpy(&desO->iv, &hash.H2, 2 * 4);
 		desO->key = swap64(desO->key);
-		desO->iv  = swap64(desO->iv);
+		// desO->iv  = swap64(desO->iv);
 	}
-	// desO->iv = swap64(desO->iv);
-	ft_dprintf(2, "salt=\nkey=%016lX\niv=%016lX\n", desO->key, desO->iv);
+	if (ivArg) desO->iv = swap64(desO->iv);
+	ft_dprintf(2, "salt=%016lX\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
 }
 
 void optionsDes(char **argv, t_optpars *optpars, t_des *desO) {
 	t_opt	*opt;
 	unsigned char ret;
-	char	*keyArg = NULL,
-	    	*input = NULL,
-			*output = NULL,
-			*ivArg = NULL,
-			*passArg = NULL,
-			*saltArg = NULL;
+	char	*input = NULL,
+			*output = NULL;
 
 	ft_bzero(optpars, sizeof(t_optpars));
 	opt_init(&opt);
-	opt_addvar2(&opt, "-k", (void**)&keyArg, OPT_STR);
+	opt_addvar2(&opt, "-k", (void**)&desO->keyArg, OPT_STR);
 	opt_addvar2(&opt, "-d", NULL, 0);
 	opt_addvar2(&opt, "-a", NULL, 0);
 	opt_addvar2(&opt, "-e", NULL, 0);
 	opt_addvar2(&opt, "-i", (void**)&input, OPT_STR);
 	opt_addvar2(&opt, "-o", (void**)&output, OPT_STR);
-	opt_addvar2(&opt, "-v", (void**)&ivArg, OPT_STR); // TODO
-	opt_addvar2(&opt, "-p", (void**)&passArg, OPT_STR); // TODO
-	opt_addvar2(&opt, "-s", (void**)&saltArg, OPT_STR); // TODO
+	opt_addvar2(&opt, "-v", (void**)&desO->ivArg, OPT_STR); // TODO
+	opt_addvar2(&opt, "-p", (void**)&desO->passArg, OPT_STR); // TODO
+	opt_addvar2(&opt, "-s", (void**)&desO->saltArg, OPT_STR); // TODO
 	ret = opt_parser(opt, argv, optpars, "ft_ssl");
 	opt_free(&opt);
 	if (ret)
 		exit(ret);
 
-	setKey(desO, keyArg, passArg, saltArg, ivArg);
+	setKey(desO, desO->keyArg, desO->passArg, desO->saltArg, desO->ivArg);
 	desO->isBase64 = ft_tabfind(optpars->opt, "-a");
 	desO->isDecode = 1;
 	if (ft_tabfind(optpars->opt, "-e") || !ft_tabfind(optpars->opt, "-d")) {
@@ -107,6 +104,7 @@ void routerDES(char **argv, t_router_des *route) {
 	t_optpars opt;
 	unsigned long keys[16], data[DES_SIZE_READ], cipherText[DES_SIZE_READ];
 	ssize_t len = 0, prevLen = 0;
+	// int isFirst = 1;
 
 	ft_bzero(&desO, sizeof(t_des));
 	ft_bzero(cipherText, DES_SIZE_READ * 8);
@@ -133,6 +131,12 @@ void routerDES(char **argv, t_router_des *route) {
 		}
 		
 		if (desO.isDecode && desO.isBase64) prevLen = base64Decode((unsigned char *)data, len, (char *)data);
+		// if (isFirst) {
+		// 	isFirst = 0;
+		// 	if (!ft_strcmp("Salted__", data)) {
+				
+		// 	}
+		// }
 		for (index = 0; index < (prevLen + (8 - (prevLen % 8)) % 8) / 8; index++) {
 			if (desO.isDecode) {
 				cipherText[index] = route->decode(&desO, data[index], keys);
