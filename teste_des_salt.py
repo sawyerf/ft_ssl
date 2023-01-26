@@ -29,29 +29,27 @@ def runCommands(algo, stdin, password, iter, name):
 
     if (myEncode == stdin and myEncode64 == stdin and hisEncode == stdin and hisEncodeB64 == stdin):
         print(Fore.GREEN, end='')
-        print(f'{algo}("{name}"): OK\'')
+        print(f'{algo}("{name}", "{key}"): OK\'')
         pass
     else:
         print(Fore.RED, end='')
         print('============= FAIL ===============')
         print(f'des-{algo}')
         print(name)
-        # print(f'./ft_ssl des-{algo} -i .test  -p "{password}" 2>&- | openssl des-{algo} -pass "pass:{password}" -d -provider legacy -provider default -pbkdf2 -iter 1000 2>&-')
-        print(f'openssl des-{algo} -pass "pass:{password}" -in .test -provider legacy -provider default -pbkdf2  | ./ft_ssl des-{algo} -d  -p "{password}" 2>&-')
-        print(f"stdin =\t\t{stdin}")
-        print(f"myStdout =\t{myEncode}")
-        print(f"myStdout =\t{myEncode64}")
-        print(f"opensslStdoutEncode =\t{hisEncode}")
-        print(f"opensslB64StdoutEncode =\t{hisEncodeB64}")
+        print(f"stdin                  =\t{stdin}")
+        print(f"ft         =\t{myEncode}")
+        print(f"ftB64      =\t{myEncode64}")
+        print(f"openssl    =\t{hisEncode}")
+        print(f"opensslB64 =\t{hisEncodeB64}")
     print(Style.RESET_ALL, end='')
 
 
 algos = ['ecb', 'cbc', 'ofb', 'cfb']
-for index in range(20):
+for index in range(100):
     for iter in [1000]:
         for key in ['', 'lolipop', 'A'*50]:
             for algo in algos:
                 runCommands(algo, 'A' * index, key, iter, f"'A' * {index}")
 
-# for algo in algos:
-#     runCommands(algo, 'A' * 100000 , '0123456789ABCDEF', 4096, f"'A' * 10000")
+for algo in algos:
+    runCommands(algo, 'A' * 100000 , '0123456789ABCDEF', 4096, f"'A' * 10000")

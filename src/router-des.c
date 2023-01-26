@@ -70,11 +70,8 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 			srandom(time(NULL));
 			salt = random() | random() << 32;
 			ft_memcpy(g_read.salted, "Salted__", 8);
-			// g_read.salted[1] = swap64(salt);
 			g_read.salted[1] = swap64(salt);
 			g_read.sizeRead = 8;
-			// write(desO->fdOutput, "Salted__", 8);
-			// write(desO->fdOutput, &salt, 8);
 		} else {
 			salt = swap64(keyToLong(saltArg, "Salt"));
 		}
@@ -160,13 +157,11 @@ void printDes(t_des *desO, t_router_des *route, int isEnd) {
 		ft_memcpy(g_read.cipherText, g_read.salted, 16);
 		ft_memcpy(g_read.cipherText + 2, &tmp, g_read.prevLen);
 		g_read.prevLen += 16;
-		// ft_printf("\nlol: %d\n", g_read.prevLen);
-		g_read.sizeRead = 8 * DES_SIZE_READ;
 		g_read.salted[0] = 0;
 	}
 	if (!desO->isDecode && desO->isBase64) {
 		base64Encode((unsigned char *)g_read.cipherText, g_read.prevLen, desO->fdOutput);
-		ft_printf("\n");
+		ft_dprintf(desO->fdOutput, "\n");
 	} else {
 		write(desO->fdOutput, g_read.cipherText, g_read.prevLen);
 	}
@@ -201,6 +196,7 @@ void routerDES(char **argv, t_router_des *route) {
 			}
 		}
 		if (len != g_read.sizeRead) break;
+		g_read.sizeRead = 8 * DES_SIZE_READ;
 	}
 	printDes(&desO, route, 1);
 }
