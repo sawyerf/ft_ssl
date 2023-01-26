@@ -6,10 +6,17 @@ import subprocess
 def runCommands(algo, stdin, password, iter, name):
     open('.test', 'w').write(stdin)
 
+    stdin = stdin.encode()
+    myEncode = stdin
+    myEncode64 = stdin
+    hisEncode = stdin
+    hisEncodeB64 = stdin
     try:
-        myStdoutEncode = subprocess.check_output(f'./ft_ssl des-{algo} -i .test  -p "{password}" 2>&- | openssl des-{algo} -pass "pass:{password}" -d -provider legacy -provider default -pbkdf2 -iter 1000 2>&-', shell=True)
+        myEncode = subprocess.check_output(f'./ft_ssl des-{algo} -i .test  -p "{password}" 2>&- | openssl des-{algo} -pass "pass:{password}" -d -provider legacy -provider default -pbkdf2 -iter 1000 2>&-', shell=True)
+        myEncode64 = subprocess.check_output(f'./ft_ssl des-{algo} -a -i .test  -p "{password}" 2>&- | openssl des-{algo} -pass "pass:{password}" -d -provider legacy -provider default -pbkdf2 -iter 1000 -a 2>&-', shell=True)
         
-        # opensslStdoutEncode = subprocess.check_output(f'openssl des-{algo} -pass "pass:{password}" -in .test -provider legacy -provider default -pbkdf2 -iter 1000 | ./ft_ssl des-{algo} -d  -p "{password}" 2>&-', shell=True)
+        hisEncode = subprocess.check_output(f'openssl des-{algo} -pass "pass:{password}" -in .test -provider legacy -provider default -pbkdf2 -iter 1000 | ./ft_ssl des-{algo} -d  -p "{password}" 2>&-', shell=True)
+        hisEncodeB64 = subprocess.check_output(f'openssl des-{algo} -a -pass "pass:{password}" -in .test -provider legacy -provider default -pbkdf2 -iter 1000 | ./ft_ssl des-{algo} -a -d  -p "{password}" 2>&-', shell=True)
     except Exception as e:
         print(Fore.RED, end='')
         print('============= FAIL ===============')
@@ -20,12 +27,8 @@ def runCommands(algo, stdin, password, iter, name):
         print('============= FAIL ===============')
         return
 
-    stdin = stdin.encode()
-    if (myStdoutEncode == stdin):
-    # if (myStdoutEncode == stdin and opensslStdoutEncode == stdin):
+    if (myEncode == stdin and myEncode64 == stdin and hisEncode == stdin and hisEncodeB64 == stdin):
         print(Fore.GREEN, end='')
-        print(f'openssl des-{algo} -pass "pass:{password}" -in .test -provider legacy -provider default -pbkdf2 -iter 1000 | ./ft_ssl des-{algo} -d  -p "{password}" 2>&-')
-
         print(f'{algo}("{name}"): OK\'')
         pass
     else:
@@ -36,8 +39,10 @@ def runCommands(algo, stdin, password, iter, name):
         # print(f'./ft_ssl des-{algo} -i .test  -p "{password}" 2>&- | openssl des-{algo} -pass "pass:{password}" -d -provider legacy -provider default -pbkdf2 -iter 1000 2>&-')
         print(f'openssl des-{algo} -pass "pass:{password}" -in .test -provider legacy -provider default -pbkdf2  | ./ft_ssl des-{algo} -d  -p "{password}" 2>&-')
         print(f"stdin =\t\t{stdin}")
-        print(f"myStdout =\t{myStdoutEncode}")
-        print(f"opensslStdoutEncode =\t{opensslStdoutEncode}")
+        print(f"myStdout =\t{myEncode}")
+        print(f"myStdout =\t{myEncode64}")
+        print(f"opensslStdoutEncode =\t{hisEncode}")
+        print(f"opensslB64StdoutEncode =\t{hisEncodeB64}")
     print(Style.RESET_ALL, end='')
 
 
@@ -48,5 +53,5 @@ for index in range(20):
             for algo in algos:
                 runCommands(algo, 'A' * index, key, iter, f"'A' * {index}")
 
-for algo in algos:
-    runCommands(algo, 'A' * 100000 , '0123456789ABCDEF', 4096, f"'A' * 10000")
+# for algo in algos:
+#     runCommands(algo, 'A' * 100000 , '0123456789ABCDEF', 4096, f"'A' * 10000")
