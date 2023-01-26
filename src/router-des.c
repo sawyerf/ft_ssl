@@ -71,7 +71,7 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 			write(desO->fdOutput, &salt, 8);
 			salt = swap64(salt);
 		} else {
-			salt = keyToLong(saltArg, "Salt");
+			salt = swap64(keyToLong(saltArg, "Salt"));
 		}
 		if (passArg) {
 			pbkdf2(passArg, salt, &hash, 1000);
@@ -84,7 +84,6 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 		}
 		if (!ivArg) {
 			ft_memcpy(&desO->iv, &hash.H2, 2 * 4);
-			desO->iv = swap64(desO->iv);
 		}
 	}
 	ft_dprintf(2, "salt=%016lX\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
