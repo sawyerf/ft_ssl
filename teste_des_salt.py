@@ -8,10 +8,8 @@ def runCommands(algo, stdin, password, iter, name):
 
     try:
         myStdoutEncode = subprocess.check_output(f'./ft_ssl des-{algo} -i .test  -p "{password}" 2>&- | openssl des-{algo} -pass "pass:{password}" -d -provider legacy -provider default -pbkdf2 -iter 1000 2>&-', shell=True)
-        # myStdoutB64Encode = subprocess.check_output(f'./ft_ssl des-{algo} -i .test  -p "{password}" -a 2>&- | openssl des-{algo} -pass "pass:{password}" -a -d -provider legacy -provider default -pbkdf2  -iter 1000', shell=True)
         
-        # opensslStdoutEncode = subprocess.check_output(f'openssl des-{algo} -pass "pass:{password}" -in .test -provider legacy -provider default -pbkdf2  | ./ft_ssl des-{algo} -d  -p "{password}" 2>&-', shell=True)
-        # opensslStdoutB64Encode = subprocess.check_output(f'openssl des-{algo} -pass "pass:{password}" -in .test -a -provider legacy -provider default -pbkdf2  | ./ft_ssl des-{algo} -d -a  -p "{password}" 2>&-', shell=True)
+        # opensslStdoutEncode = subprocess.check_output(f'openssl des-{algo} -pass "pass:{password}" -in .test -provider legacy -provider default -pbkdf2 -iter 1000 | ./ft_ssl des-{algo} -d  -p "{password}" 2>&-', shell=True)
     except Exception as e:
         print(Fore.RED, end='')
         print('============= FAIL ===============')
@@ -24,7 +22,10 @@ def runCommands(algo, stdin, password, iter, name):
 
     stdin = stdin.encode()
     if (myStdoutEncode == stdin):
+    # if (myStdoutEncode == stdin and opensslStdoutEncode == stdin):
         print(Fore.GREEN, end='')
+        print(f'openssl des-{algo} -pass "pass:{password}" -in .test -provider legacy -provider default -pbkdf2 -iter 1000 | ./ft_ssl des-{algo} -d  -p "{password}" 2>&-')
+
         print(f'{algo}("{name}"): OK\'')
         pass
     else:
@@ -32,14 +33,11 @@ def runCommands(algo, stdin, password, iter, name):
         print('============= FAIL ===============')
         print(f'des-{algo}')
         print(name)
+        # print(f'./ft_ssl des-{algo} -i .test  -p "{password}" 2>&- | openssl des-{algo} -pass "pass:{password}" -d -provider legacy -provider default -pbkdf2 -iter 1000 2>&-')
+        print(f'openssl des-{algo} -pass "pass:{password}" -in .test -provider legacy -provider default -pbkdf2  | ./ft_ssl des-{algo} -d  -p "{password}" 2>&-')
         print(f"stdin =\t\t{stdin}")
-        # print(f"myStdout =\t{myStdoutEncode}")
-        # print(f"opensslStdoutEncode =\t{opensslStdoutEncode}")
-        # print(f"opensslStdoutB64Encode =\t{opensslStdoutB64Encode}")
-        # print(f"myStdoutB64 =\t{myStdoutB64Encode}")
-        print(myStdoutEncode)
-        # print(hisStdoutEncode)
-        # print('============= FAIL ===============')
+        print(f"myStdout =\t{myStdoutEncode}")
+        print(f"opensslStdoutEncode =\t{opensslStdoutEncode}")
     print(Style.RESET_ALL, end='')
 
 

@@ -6,7 +6,6 @@
 #include <time.h>
 
 typedef struct	s_read {
-	// unsigned long data[DES_SIZE_READ];
 	unsigned long cipherText[DES_SIZE_READ];
 	ssize_t prevLen;
 }				t_read;
@@ -94,7 +93,7 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 	if (isLol) {
 		for (int index = 0; index < (g_read.prevLen + (8 - (g_read.prevLen % 8)) % 8) / 8; index++) {
 			g_read.cipherText[index] = route->decode(desO, data[index], desO->keys);
-			// print_hex((void*)g_read.cipherText, g_read.prevLen);
+			print_hex((void*)g_read.cipherText, g_read.prevLen);
 		}
 	}
 }
@@ -113,9 +112,9 @@ void optionsDes(char **argv, t_optpars *optpars, t_des *desO, t_router_des *rout
 	opt_addvar2(&opt, "-e", NULL, 0);
 	opt_addvar2(&opt, "-i", (void**)&input, OPT_STR);
 	opt_addvar2(&opt, "-o", (void**)&output, OPT_STR);
-	opt_addvar2(&opt, "-v", (void**)&desO->ivArg, OPT_STR); // TODO
-	opt_addvar2(&opt, "-p", (void**)&desO->passArg, OPT_STR); // TODO
-	opt_addvar2(&opt, "-s", (void**)&desO->saltArg, OPT_STR); // TODO
+	opt_addvar2(&opt, "-v", (void**)&desO->ivArg, OPT_STR);
+	opt_addvar2(&opt, "-p", (void**)&desO->passArg, OPT_STR);
+	opt_addvar2(&opt, "-s", (void**)&desO->saltArg, OPT_STR);
 	ret = opt_parser(opt, argv, optpars, "ft_ssl");
 	opt_free(&opt);
 	if (ret)
@@ -138,6 +137,23 @@ void optionsDes(char **argv, t_optpars *optpars, t_des *desO, t_router_des *rout
 	setKey(route, desO, desO->keyArg, desO->passArg, desO->saltArg, desO->ivArg);
 }
 
+void printDes(t_des *desO, t_router_des *route, int isEnd) {
+	unsigned char padding = ((unsigned char*)g_read.cipherText)[g_read.prevLen - 1];
+
+	if (isEnd && desO->isDecode && route->isPadding && g_read.prevLen) {
+		if (padding > 8 || (ssize_t)padding > g_read.prevLen) {
+			ft_dprintf(2, "Wrong padding\n", g_read.prevLen, padding, padding);
+			exit(1);
+		}
+		g_read.prevLen -= padding;
+	}
+	if (!desO->isDecode && desO->isBase64) {
+		base64Encode((unsigned char *)g_read.cipherText, g_read.prevLen, desO->fdOutput);
+	} else {
+		write(desO->fdOutput, g_read.cipherText, g_read.prevLen);
+	}
+}
+
 void routerDES(char **argv, t_router_des *route) {
 	t_des	desO;
 	t_optpars opt;
@@ -146,22 +162,15 @@ void routerDES(char **argv, t_router_des *route) {
 
 	ft_bzero(&desO, sizeof(t_des));
 	ft_bzero(&g_read, sizeof(t_read));
-	// ft_bzero(cipherText, DES_SIZE_READ * 8);
 
 	optionsDes(argv, &opt, &desO, route);
-
 	while ((len = turboRead(desO.fdInput, data, 8 * DES_SIZE_READ, desO.isDecode & desO.isBase64)) >= 0) {
 		int index;
 
-		if (desO.isDecode && !len && g_read.prevLen && route->isPadding) g_read.prevLen -= ((unsigned char*)g_read.cipherText)[g_read.prevLen - 1];
-		if (!desO.isDecode && desO.isBase64) {
-			base64Encode((unsigned char *)g_read.cipherText, g_read.prevLen, desO.fdOutput);
-		} else {
-			write(desO.fdOutput, g_read.cipherText, g_read.prevLen);
-		}
-
+		if (desO.isDecode && !len) break;
+		printDes(&desO, route, 0);
 		g_read.prevLen = len;
-		if (!desO.isDecode && len != 8 * DES_SIZE_READ && route->isPadding) {
+		if (len != 8 * DES_SIZE_READ && !desO.isDecode && route->isPadding) {
 			g_read.prevLen = desPadding(data, len);
 		}
 		
@@ -175,15 +184,5 @@ void routerDES(char **argv, t_router_des *route) {
 		}
 		if (len != 8 * DES_SIZE_READ) break;
 	}
-	unsigned char padding = ((unsigned char*)g_read.cipherText)[g_read.prevLen - 1];
-	if (desO.isDecode && g_read.prevLen && (padding > 8 || (ssize_t)padding > (g_read.prevLen | !padding)) && route->isPadding) {
-		ft_dprintf(2, "Wrong padding\n", g_read.prevLen, padding, padding);
-		exit(1);
-	}
-	if (desO.isDecode && g_read.prevLen && (((unsigned char*)g_read.cipherText)[g_read.prevLen - 1] <= len) && route->isPadding) g_read.prevLen -= ((unsigned char*)g_read.cipherText)[g_read.prevLen - 1];
-	if (!desO.isDecode && desO.isBase64) {
-		base64Encode((unsigned char *)g_read.cipherText, g_read.prevLen, desO.fdOutput);
-	} else {
-		write(desO.fdOutput, g_read.cipherText, g_read.prevLen);
-	}
+	printDes(&desO, route, 1);
 }

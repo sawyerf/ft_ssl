@@ -9,9 +9,9 @@ def runCommands(algo, stdin, key, name):
 	try:
 		# myStdout = os.popen(f'cat .test | ./ft_ssl des-ecb -k {key} | ./ft_ssl des-ecb -d -k {key}').read()
 		# myStdoutB64 = os.popen(f'cat .test | ./ft_ssl des-ecb -a -k {key} | ./ft_ssl des-ecb -a -d -k {key}').read()
-		myStdout = subprocess.check_output(f'cat .test | ./ft_ssl des-{algo} -k {key} -v {key} | ./ft_ssl des-{algo} -d -k {key} -v {key} ', shell=True)
-		myStdoutB64 = subprocess.check_output(f'cat .test | ./ft_ssl des-{algo} -a -k {key} -v {key} | ./ft_ssl des-{algo} -a -d -k {key} -v {key}', shell=True)
-		myStdoutEncode = subprocess.check_output(f'cat .test | ./ft_ssl des-{algo} -k {key} -v {key}', shell=True)
+		myStdout = subprocess.check_output(f'cat .test | ./ft_ssl des-{algo} -k {key} -v {key} 2>&- | ./ft_ssl des-{algo} -d -k {key} -v {key}  2>&-', shell=True)
+		myStdoutB64 = subprocess.check_output(f'cat .test | ./ft_ssl des-{algo} -a -k {key} -v {key} 2>&- | ./ft_ssl des-{algo} -a -d -k {key} -v {key} 2>&-', shell=True)
+		myStdoutEncode = subprocess.check_output(f'cat .test | ./ft_ssl des-{algo} -k {key} -v {key} 2>&-', shell=True)
 		if (algo != 'ctr'):
 			hisStdoutEncode = subprocess.check_output(f'cat .test | openssl des-{algo} -provider legacy -provider default -iv {key} -K {key} 2>&-', shell=True)
 		else:
