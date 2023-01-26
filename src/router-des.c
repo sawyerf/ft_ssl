@@ -42,7 +42,7 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 	unsigned long data[DES_SIZE_READ];
 
 	if (keyArg) desO->key = keyToLong(keyArg, "Key");
-	if (ivArg)  desO->iv = keyToLong(ivArg, "IV");
+	if (ivArg)  desO->iv = swap64(keyToLong(ivArg, "IV"));
 	if (!keyArg || !ivArg) {
 		t_hash hash;
 
@@ -78,11 +78,6 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 		} else {
 			pbkdf2("", salt, &hash, 1000);
 		}
-		// } else {
-		// 	passArg = getpass("Password: ");
-		// 	pbkdf2(passArg, salt, &hash, 1000);
-		// 	free(passArg);
-		// }
 		if (!keyArg) {
 			ft_memcpy(&desO->key, &hash.H0, 2 * 4);
 			desO->key = swap64(desO->key);
@@ -92,7 +87,6 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 			desO->iv = swap64(desO->iv);
 		}
 	}
-	// if (ivArg) desO->iv = swap64(desO->iv);
 	ft_dprintf(2, "salt=%016lX\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
 	generateKey(desO->key, desO->keys);
 	if (desO->isDecode && route->isPadding) {
@@ -101,6 +95,7 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 	if (isLol) {
 		for (int index = 0; index < (g_read.prevLen + (8 - (g_read.prevLen % 8)) % 8) / 8; index++) {
 			g_read.cipherText[index] = route->decode(desO, data[index], desO->keys);
+			// print_hex((void*)g_read.cipherText, g_read.prevLen);
 		}
 	}
 }
