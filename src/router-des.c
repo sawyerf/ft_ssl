@@ -76,9 +76,9 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 			salt = swap64(keyToLong(saltArg, "Salt"));
 		}
 		if (passArg) {
-			pbkdf2(passArg, salt, &hash, 1000);
+			pbkdf2(passArg, salt, &hash, desO->iterArg);
 		} else {
-			pbkdf2("", salt, &hash, 1000);
+			pbkdf2("", salt, &hash, desO->iterArg);
 		}
 		if (!keyArg) {
 			ft_memcpy(&desO->key, &hash.H0, 2 * 4);
@@ -96,7 +96,6 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 	if (isLol) {
 		for (int index = 0; index < (g_read.prevLen + (8 - (g_read.prevLen % 8)) % 8) / 8; index++) {
 			g_read.cipherText[index] = route->decode(desO, data[index], desO->keys);
-			// print_hex((void*)g_read.cipherText, g_read.prevLen);
 		}
 	}
 }
@@ -109,6 +108,7 @@ void optionsDes(char **argv, t_optpars *optpars, t_des *desO, t_router_des *rout
 
 	ft_bzero(optpars, sizeof(t_optpars));
 	opt_init(&opt);
+	desO->iterArg = 1000;
 	opt_addvar2(&opt, "-k", (void**)&desO->keyArg, OPT_STR);
 	opt_addvar2(&opt, "-d", NULL, 0);
 	opt_addvar2(&opt, "-a", NULL, 0);
@@ -118,11 +118,16 @@ void optionsDes(char **argv, t_optpars *optpars, t_des *desO, t_router_des *rout
 	opt_addvar2(&opt, "-v", (void**)&desO->ivArg, OPT_STR);
 	opt_addvar2(&opt, "-p", (void**)&desO->passArg, OPT_STR);
 	opt_addvar2(&opt, "-s", (void**)&desO->saltArg, OPT_STR);
+	opt_addvar(&opt,  "--iter", (void*)&desO->iterArg, OPT_INT);
 	ret = opt_parser(opt, argv, optpars, "ft_ssl");
 	opt_free(&opt);
 	if (ret)
 		exit(ret);
 
+	if (desO->iterArg <= 0) {
+		ft_dprintf(2, "Non-positive number `%d' for option --iter\n", desO->iterArg);
+		exit(1);
+	}
 	desO->isBase64 = ft_tabfind(optpars->opt, "-a");
 	desO->isDecode = 1;
 	if (ft_tabfind(optpars->opt, "-e") || !ft_tabfind(optpars->opt, "-d")) {
