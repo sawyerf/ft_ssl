@@ -2,6 +2,8 @@
 
 #define BLOC_SIZE 64
 
+extern t_router routesHash[];
+
 void	hmacConcat(t_hash *hash, char *key, size_t lenKey, char *message, size_t lenMes, char c) {
 	char	buffer[BLOC_SIZE];
 	size_t index = 0;
@@ -35,8 +37,16 @@ void	swap32cpy(unsigned int *dst, unsigned int *src) {
 
 void	hmacSha256(t_hash *hash, char *key, size_t lenKey, char *message, size_t lenMes) {
 	unsigned int buffer[8];
+	t_hash tmp;
 
 	
+	if (lenKey > BLOC_SIZE) {
+		getArg(key, lenKey, &tmp, routesHash + 2);
+		// ft_printf("%s\n", routesHash[2].name);
+		swap32cpy((void*)&tmp, (void*)&tmp);
+		key = (char*)&tmp;
+		lenKey = 32;
+	}
 	hmacConcat(hash, key, lenKey, message, lenMes, 0x36);
 	swap32cpy(buffer, (void*)hash);
 	hmacConcat(hash, key, lenKey, (void*)buffer, HASH32_SIZE, 0x5c);

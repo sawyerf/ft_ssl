@@ -133,7 +133,7 @@ void optionsDes(char **argv, t_optpars *optpars, t_des *desO, t_router_des *rout
 		ft_dprintf(2, "ERROR: Can't open file `%s'\n", input);
 		exit(1);
 	}
-	if (output && (desO->fdOutput = open(output, O_RDWR | O_CREAT, 0644)) < 0) {
+	if (output && (desO->fdOutput = open(output, O_RDWR | O_CREAT | O_TRUNC, 0644)) < 0) {
 		ft_dprintf(2, "ERROR: Can't open file `%s'\n", output);
 		exit(1);
 	}
@@ -161,7 +161,7 @@ void printDes(t_des *desO, t_router_des *route, int isEnd) {
 	}
 	if (!desO->isDecode && desO->isBase64) {
 		base64Encode((unsigned char *)g_read.cipherText, g_read.prevLen, desO->fdOutput);
-		ft_dprintf(desO->fdOutput, "\n");
+		if (g_read.prevLen) ft_dprintf(desO->fdOutput, "\n");
 	} else {
 		write(desO->fdOutput, g_read.cipherText, g_read.prevLen);
 	}

@@ -45,11 +45,10 @@ def runCommands(algo, stdin, password, iter, name):
 
 
 algos = ['ecb', 'cbc', 'ofb', 'cfb']
-for index in range(100):
-    for iter in [1000]:
-        for key in ['', 'lolipop', 'A'*50]:
-            for algo in algos:
-                runCommands(algo, 'A' * index, key, iter, f"'A' * {index}")
+for index in range(1):
+    for key in ['', 'lolipop', 'A'*100]:
+        for algo in algos:
+            runCommands(algo, 'A' * index, key, iter, f"'A' * {index}")
 
 for algo in algos:
     runCommands(algo, 'A' * 100000 , '0123456789ABCDEF', 4096, f"'A' * 10000")
