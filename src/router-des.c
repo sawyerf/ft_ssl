@@ -40,6 +40,7 @@ unsigned long keyToLong(char *key, char *name) {
 void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg) {
 	unsigned long salt;
 	int isLol = 0;
+	int isGetPass = 0;
 	unsigned long data[DES_SIZE_READ];
 
 	if (keyArg) desO->key = keyToLong(keyArg, "Key");
@@ -49,6 +50,7 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 
 		if (!passArg && !keyArg) {
 			passArg = getpass("Password: ");
+			isGetPass = 1;
 		}
 		if (!saltArg && desO->isDecode) {
 			ft_bzero(data, 8 * DES_SIZE_READ);
@@ -77,6 +79,7 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 		}
 		if (passArg) {
 			pbkdf2(passArg, salt, &hash, desO->iterArg);
+			if (isGetPass) free(passArg);
 		} else {
 			pbkdf2("", salt, &hash, desO->iterArg);
 		}
