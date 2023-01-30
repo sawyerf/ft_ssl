@@ -133,7 +133,7 @@ void	routerBase64(char **argv) {
 		}
 	}
 	if (output) {
-		if ((fdo = open(output, O_WRONLY | O_CREAT)) < 0) { // Fichier existe deja
+		if ((fdo = open(output, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0) { // Fichier existe deja
 			ft_dprintf(2, "ERROR: Can't open file `%s'\n", output);
 			exit(1);
 		}
@@ -148,10 +148,10 @@ void	routerBase64(char **argv) {
 			write(fdo, data, nlen);
 		} else {
 			base64Encode(data, len, fdo);
+			write(fdo, "\n", 1);
 		}
-		if (len != 120) return ;
+		if (len != 120) break;
 	}
-	// ft_dprintf(fdo, "\n");
 	close(fdi);
 	close(fdo);
 }

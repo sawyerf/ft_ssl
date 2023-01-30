@@ -6,6 +6,10 @@ import subprocess
 def runCommands(algo, stdin, key, name):
 	open('.test', 'w').write(stdin)
 
+	stdin = stdin.encode()
+	myEncode = stdin
+	hisEncode = stdin
+	
 	try:
 		# myStdout = os.popen(f'cat .test | ./ft_ssl des-ecb -k {key} | ./ft_ssl des-ecb -d -k {key}').read()
 		# myStdoutB64 = os.popen(f'cat .test | ./ft_ssl des-ecb -a -k {key} | ./ft_ssl des-ecb -a -d -k {key}').read()
@@ -14,6 +18,11 @@ def runCommands(algo, stdin, key, name):
 		myStdoutEncode = subprocess.check_output(f'cat .test | ./ft_ssl des-{algo} -k {key} -v {key} 2>&-', shell=True)
 		if (algo != 'ctr'):
 			hisStdoutEncode = subprocess.check_output(f'cat .test | openssl des-{algo} -provider legacy -provider default -iv {key} -K {key} 2>&-', shell=True)
+
+			myEncode = subprocess.check_output(f'./ft_ssl des-{algo} -i .test -k {key} -v {key} 2>&- | openssl des-{algo} -K {key} -iv {key} -d -provider legacy -provider default 2>&-', shell=True)
+			hisEncode = subprocess.check_output(f'openssl des-{algo} -K {key} -iv {key} -in .test -provider legacy -provider default 2>&- | ./ft_ssl des-{algo} -d -k {key} -v {key} 2>&-', shell=True)
+			myEncode = subprocess.check_output(f'./ft_ssl des-{algo} -i .test -k {key} -v {key} -a 2>&- | openssl des-{algo} -K {key} -iv {key} -d -a -provider legacy -provider default 2>&-', shell=True)
+			hisEncode = subprocess.check_output(f'openssl des-{algo} -K {key} -iv {key} -in .test -a -provider legacy -provider default 2>&- | ./ft_ssl des-{algo} -d -k {key} -v {key} -a  2>&-', shell=True)
 		else:
 			hisStdoutEncode = myStdoutEncode
 	except Exception as e:
@@ -26,10 +35,9 @@ def runCommands(algo, stdin, key, name):
 		print('============= FAIL ===============')
 		return
 
-	stdin = stdin.encode()
-	if (myStdout == stdin and myStdoutB64 == stdin and myStdoutEncode == hisStdoutEncode):
-		# print(Fore.GREEN, end='')
-		# print(f'{algo}("{name}"): OK\'')
+	if (myStdout == stdin and myStdoutB64 == stdin and myStdoutEncode == hisStdoutEncode and myEncode == stdin and hisEncode == stdin):
+		print(Fore.GREEN, end='')
+		print(f'{algo}("{name}"): OK\'')
 		pass
 	else:
 		print(Fore.RED, end='')

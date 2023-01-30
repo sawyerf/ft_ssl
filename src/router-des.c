@@ -37,7 +37,7 @@ unsigned long keyToLong(char *key, char *name) {
 	return atoi_hex(keyStr);
 }
 
-void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg) {
+void setKey(t_router_des *route, t_optpars *optpars, t_des *desO, char *keyArg, char *passArg, char *saltArg, char *ivArg) {
 	unsigned long salt;
 	int isLol = 0;
 	int isGetPass = 0;
@@ -47,12 +47,13 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 	if (ivArg)  desO->iv = swap64(keyToLong(ivArg, "IV"));
 	if (!keyArg || !ivArg) {
 		t_hash hash;
+		int isIV = ft_strcmp("des-ecb", route->name);
 
 		if (!passArg && !keyArg) {
 			passArg = getpass("Password: ");
 			isGetPass = 1;
 		}
-		if (!saltArg && desO->isDecode) {
+		if (!saltArg && desO->isDecode && isIV) {
 			ft_bzero(data, 8 * DES_SIZE_READ);
 			isLol = 1;
 
@@ -71,11 +72,11 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 		} else if (!saltArg) {
 			srandom(time(NULL));
 			salt = random() | random() << 32;
-			ft_memcpy(g_read.salted, "Salted__", 8);
+			if (isIV) ft_memcpy(g_read.salted, "Salted__", 8);
 			g_read.salted[1] = swap64(salt);
 			g_read.sizeRead = 8;
 		} else {
-			salt = swap64(keyToLong(saltArg, "Salt"));
+			salt = keyToLong(saltArg, "Salt");
 		}
 		if (passArg) {
 			pbkdf2(passArg, salt, &hash, desO->iterArg);
@@ -90,8 +91,8 @@ void setKey(t_router_des *route, t_des *desO, char *keyArg, char *passArg, char 
 		if (!ivArg) {
 			ft_memcpy(&desO->iv, &hash.H2, 2 * 4);
 		}
+		if (!ft_tabfind(optpars->opt, "-q")) ft_dprintf(2, "salt=%016lX\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
 	}
-	ft_dprintf(2, "salt=%016lX\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
 	generateKey(desO->key, desO->keys);
 	if (desO->isDecode && route->isPadding) {
 		revTabLong(desO->keys, 16);
@@ -116,6 +117,7 @@ void optionsDes(char **argv, t_optpars *optpars, t_des *desO, t_router_des *rout
 	opt_addvar2(&opt, "-d", NULL, 0);
 	opt_addvar2(&opt, "-a", NULL, 0);
 	opt_addvar2(&opt, "-e", NULL, 0);
+	opt_addvar2(&opt, "-q", NULL, 0);
 	opt_addvar2(&opt, "-i", (void**)&input, OPT_STR);
 	opt_addvar2(&opt, "-o", (void**)&output, OPT_STR);
 	opt_addvar2(&opt, "-v", (void**)&desO->ivArg, OPT_STR);
@@ -145,7 +147,7 @@ void optionsDes(char **argv, t_optpars *optpars, t_des *desO, t_router_des *rout
 		ft_dprintf(2, "ERROR: Can't open file `%s'\n", output);
 		exit(1);
 	}
-	setKey(route, desO, desO->keyArg, desO->passArg, desO->saltArg, desO->ivArg);
+	setKey(route, optpars, desO, desO->keyArg, desO->passArg, desO->saltArg, desO->ivArg);
 }
 
 void printDes(t_des *desO, t_router_des *route, int isEnd) {
