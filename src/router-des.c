@@ -45,15 +45,14 @@ void setKey(t_router_des *route, t_optpars *optpars, t_des *desO, char *keyArg, 
 
 	if (keyArg) desO->key = keyToLong(keyArg, "Key");
 	if (ivArg)  desO->iv = swap64(keyToLong(ivArg, "IV"));
-	if (!keyArg || !ivArg) {
+	if (!keyArg || (!ivArg && passArg)) {
 		t_hash hash;
-		int isIV = ft_strcmp("des-ecb", route->name);
 
 		if (!passArg && !keyArg) {
 			passArg = getpass("Password: ");
 			isGetPass = 1;
 		}
-		if (!saltArg && desO->isDecode && isIV) {
+		if (!saltArg && desO->isDecode) {
 			ft_bzero(data, 8 * DES_SIZE_READ);
 			isLol = 1;
 
@@ -72,7 +71,7 @@ void setKey(t_router_des *route, t_optpars *optpars, t_des *desO, char *keyArg, 
 		} else if (!saltArg) {
 			srandom(time(NULL));
 			salt = random() | random() << 32;
-			if (isIV) ft_memcpy(g_read.salted, "Salted__", 8);
+			ft_memcpy(g_read.salted, "Salted__", 8);
 			g_read.salted[1] = swap64(salt);
 			g_read.sizeRead = 8;
 		} else {
@@ -92,6 +91,10 @@ void setKey(t_router_des *route, t_optpars *optpars, t_des *desO, char *keyArg, 
 			ft_memcpy(&desO->iv, &hash.H2, 2 * 4);
 		}
 		if (!ft_tabfind(optpars->opt, "-q")) ft_dprintf(2, "salt=%016lX\nkey=%016lX\niv=%016lX\n", salt, desO->key, desO->iv);
+	}
+	if (!ivArg && !desO->iv && ft_strcmp("des-ecb", route->name)) {
+		ft_dprintf(2, "Error: IV undefined\n");
+		exit(1);
 	}
 	generateKey(desO->key, desO->keys);
 	if (desO->isDecode && route->isPadding) {
