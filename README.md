@@ -1,7 +1,6 @@
-# ft_ssl_md5
+# 🔒 ft_ssl
 
-## How do you do you do what you going to do do ?
-
+# MD5
 - MD5 (128 bits)
 - SHA-1 (160bits)
 - SHA-2 (256-512bits)
@@ -33,8 +32,12 @@ Ces 3 fonctions de hashage se base sur la construction de [Merkle-Damgard](https
 
 ![lol](https://www.hds.utc.fr/~wschon/sr06/crypto/images/md5_1.gif)
 
-## Pseudo Code DES
-{{syntaxhighlight|lang=C|code=}}
+# DES
+
+![Diagram DES](https://user-images.githubusercontent.com/22857002/216019624-0be004af-b54c-4a16-aea7-88596f36a500.svg)
+
+## Pseudocode
+
 ```C
 // Pre-processing: padding with zeros
 append padding until len in bits ≡ 0 (mod 64)
@@ -90,8 +93,13 @@ for each 64-bit chunk of padded message do
 end for
 ```
 
+## Pense bete
+![XOR diagram](https://user-images.githubusercontent.com/22857002/216021133-94ce4136-2ecd-46ee-ac55-a6133c00bee0.png)
+
 ## Source
 - [Youtube - Complément : Fonctions de hachage](https://www.youtube.com/watch?v=-k_axU98AZ4)
 - [Wikipedia MD5](https://fr.wikipedia.org/wiki/MD5)
 - [Etude d'une fonction de hachage : le MD5](https://www.bibmath.net/crypto/index.php?action=affiche&quoi=moderne/md5)
 - [Wikipedia Sha256](https://en.wikipedia.org/wiki/SHA-2)
+- [DES algo - Scaler](https://www.scaler.com/topics/des-algorithm/)
+- [Cryptage symetrique DES - Youtube](https://www.youtube.com/watch?v=eIbgy_ra9Us)
